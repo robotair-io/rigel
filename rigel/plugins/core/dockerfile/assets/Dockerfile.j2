@@ -57,7 +57,7 @@ COPY {{ file}} /ros_workspace/src/{{ file }}
 {%- endfor %}
 {%- endif %}
 
-# Clone repositories.
+# Clone repositories from .repos or .rosinstall.
 RUN cd /ros_workspace \ 
     && /bin/bash -c "source /opt/ros/{{ distro }}/setup.bash \
 {%- for file in configuration.rosinstall %}
@@ -92,6 +92,20 @@ RUN sudo apt clean && sudo apt update && sudo apt install -y \
 # Execute additional commands.
 {% for cmd in configuration.docker_run -%}
 RUN {{ cmd }}
+{% endfor -%}
+{%- endif %}
+
+{% if configuration.python_dependencies is defined and configuration.python_dependencies|length > 0 -%}
+# Install python dependencies
+{% for python_dependency in configuration.python_dependencies -%}
+RUN pip install {{ python_dependency }}
+{% endfor -%}
+{%- endif %}
+
+{% if configuration.python_requirements is defined and configuration.python_requirements|length > 0 -%}
+# Install python dependencies from the requirement files
+{% for python_requirement_file in configuration.python_requirements -%}
+RUN pip install -r {{ python_requirement_file }}
 {% endfor -%}
 {%- endif %}
 

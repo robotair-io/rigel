@@ -46,6 +46,7 @@ class Plugin(PluginBase):
             raise RigelError(base='Multiple SSH key providers were found. Please specify which provider you want to use.')
         elif providers:
             self.__ssh_keys = providers[0]
+        
 
     def start(self) -> None:
 
