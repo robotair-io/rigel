@@ -4,7 +4,10 @@ from typing import Protocol, runtime_checkable
 @runtime_checkable
 class Plugin(Protocol):
     """
-    This class specifies the interface that all plugins must comply with.
+    Defines a protocol for plugins that can be executed and stopped. It consists
+    of two methods: `run`, which initiates the plugin's execution, and `stop`,
+    which terminates its operation.
+
     """
 
     def run(self) -> None:

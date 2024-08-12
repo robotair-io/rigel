@@ -1,0 +1,2437 @@
+[
+  {
+    "name": "__init__.py",
+    "path": "rigel/files/__init__.py",
+    "content": {
+      "structured": {
+        "description": "And imports various modules from separate files: RigelfileCreator, YAMLDataDecoder, YAMLDataLoader, and Renderer. These modules likely implement functionality related to working with data in YAML format, including decoding, loading, creating rigelfiles, and rendering. The code appears to utilize the yaml package for handling YAML data.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "creator.py",
+    "path": "rigel/files/creator.py",
+    "content": {
+      "structured": {
+        "description": "A class `RigelfileCreator` that creates a new Rigelfile by copying a template file from a package resource to a local directory. The code uses `pkg_resources` and `shutil` packages for this purpose.",
+        "items": [
+          {
+            "id": "a973ba22-0ebc-fa95-b043-ed913f004fc0",
+            "ancestors": [],
+            "description": "Copies a file named \"Rigelfile\" from a specific path within the project's assets to the current directory. The copying operation is done using the `shutil.copyfile` function, which ensures that all metadata (permissions, timestamp) of the source file are preserved in the destination file.",
+            "attributes": [],
+            "name": "RigelfileCreator",
+            "location": {
+              "start": 5,
+              "insert": 6,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 5,
+                "end": 8
+              }
+            },
+            "item_type": "class",
+            "length": 4,
+            "docLength": 3
+          },
+          {
+            "id": "a2694e85-3f34-9aba-844d-27fe5d3d882b",
+            "ancestors": [
+              "a973ba22-0ebc-fa95-b043-ed913f004fc0"
+            ],
+            "description": "Creates a copy of the \"Rigelfile\" asset file from a resource directory to the current working directory, effectively duplicating the file at the specified location.",
+            "params": [],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "creator = RigelfileCreator()\ncreator.create()",
+              "description": ""
+            },
+            "name": "create",
+            "location": {
+              "start": 10,
+              "insert": 11,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 10,
+                "end": 13
+              }
+            },
+            "item_type": "method",
+            "length": 3,
+            "docLength": 3
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "decoder.py",
+    "path": "rigel/files/decoder.py",
+    "content": {
+      "structured": {
+        "description": "A class YAMLDataDecoder that decodes YAML data by replacing variables marked with delimiters {{ and }} with corresponding values from user-defined variables on a Rigelfile or environment variables. The decoding process is done recursively through the entire YAML data structure, prioritizing user-defined variables over environment variables for conflicts. The code utilizes regular expressions (re) to match variable names and exception handling (UndeclaredGlobalVariableError) for unrecognised variable references.",
+        "items": [
+          {
+            "id": "ca903380-703b-04ac-244b-8aafa41cd8dd",
+            "ancestors": [],
+            "description": "Decodes YAML data by replacing template variables enclosed between `{{ }}` delimiters with their corresponding values from a dictionary or environment variables. It recursively traverses dictionaries and lists to process nested structures.",
+            "attributes": [],
+            "name": "YAMLDataDecoder",
+            "location": {
+              "start": 7,
+              "insert": 8,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 7,
+                "end": 17
+              }
+            },
+            "item_type": "class",
+            "length": 65,
+            "docLength": 10
+          },
+          {
+            "id": "3bfacd26-5321-8286-2e45-ae54f6e37f02",
+            "ancestors": [
+              "ca903380-703b-04ac-244b-8aafa41cd8dd"
+            ],
+            "description": "Removes curly braces and spaces from a given string, effectively extracting a variable name from a YAML-like format.",
+            "name": "__extract_variable_name",
+            "location": {
+              "start": 19,
+              "insert": 20,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 19,
+                "end": 29
+              }
+            },
+            "item_type": "method",
+            "length": 6,
+            "docLength": 10
+          },
+          {
+            "id": "d510937e-5a23-7997-8f43-b212d805cd36",
+            "ancestors": [
+              "ca903380-703b-04ac-244b-8aafa41cd8dd"
+            ],
+            "description": "Recursively decodes complex data structures such as dictionaries and lists from their encoded form to their original structure.",
+            "name": "__aux_decode",
+            "location": {
+              "start": 36,
+              "insert": 37,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 36,
+                "end": 44
+              }
+            },
+            "item_type": "method",
+            "length": 5,
+            "docLength": 8
+          },
+          {
+            "id": "d63d42c0-febf-91aa-9840-4dee4f31b2a0",
+            "ancestors": [
+              "ca903380-703b-04ac-244b-8aafa41cd8dd"
+            ],
+            "description": "Recursively decodes a dictionary by replacing placeholder variables with actual values from environment variables or an input dictionary, ensuring that string fields contain delimiters and raising an error for undeclared global variables.",
+            "name": "__aux_decode_dict",
+            "location": {
+              "start": 50,
+              "insert": 51,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 50,
+                "end": 61
+              }
+            },
+            "item_type": "method",
+            "length": 17,
+            "docLength": 11
+          },
+          {
+            "id": "84528f22-1a4f-0ab2-fc42-116a9514ebe6",
+            "ancestors": [
+              "ca903380-703b-04ac-244b-8aafa41cd8dd"
+            ],
+            "description": "Recursively decodes a list by replacing placeholders ({{}}) with actual values from variables or environment variables, and then calls itself for each element in the list if it's not a string.",
+            "name": "__aux_decode_list",
+            "location": {
+              "start": 79,
+              "insert": 80,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 79,
+                "end": 89
+              }
+            },
+            "item_type": "method",
+            "length": 17,
+            "docLength": 10
+          },
+          {
+            "id": "52f2baa2-67a3-3f9b-5646-59752bd99c3d",
+            "ancestors": [
+              "ca903380-703b-04ac-244b-8aafa41cd8dd"
+            ],
+            "description": "Takes a dictionary-like object as input and decodes its contents. It extracts variables from the input, calls an auxiliary decoding function, and returns the decoded data. The method is part of a process that involves parsing YAML data into a structured format.",
+            "params": [
+              {
+                "name": "data",
+                "type_name": "Dict[str, Any]",
+                "description": "Expected to be a dictionary with at least one key-value pair where 'vars' is the key and its value is an iterable list of variables."
+              }
+            ],
+            "returns": {
+              "type_name": "Dict[str, Any]",
+              "description": "Modified version of input data after calling another internal method `__aux_decode`. The returned dictionary preserves its original structure but may contain decoded values."
+            },
+            "usage": {
+              "language": "python",
+              "code": "yaml_data = {\n    'name': '{{ name }}',\n    'age': 30,\n    'address': {\n        'street': '{{ street }}'\n    }\n}\ndecoder = YAMLDataDecoder()\ndecoded_yaml_data = decoder.decode(yaml_data)\n",
+              "description": "\nIn this example, the function decode is used to replace template variables in a YAML data structure."
+            },
+            "name": "decode",
+            "location": {
+              "start": 108,
+              "insert": 109,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 108,
+                "end": 117
+              }
+            },
+            "item_type": "method",
+            "length": 5,
+            "docLength": 9
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "loader.py",
+    "path": "rigel/files/loader.py",
+    "content": {
+      "structured": {
+        "description": "A YAMLDataLoader class that loads and parses YAML files. It opens a specified file path in read mode and uses the yaml.safe_load function from the PyYAML library to extract its contents. The loaded data is then checked for emptiness, and if it's empty, an EmptyRigelfileError is raised.",
+        "items": [
+          {
+            "id": "87c5f6b2-c760-65bb-b446-6b8f524ab5d2",
+            "ancestors": [],
+            "description": "Loads YAML data from a file and returns it as a Python object. It handles errors, including non-existent files, invalid YAML syntax, and empty files. It also provides specific error messages for each type of error encountered.",
+            "attributes": [
+              {
+                "name": "filepath",
+                "type_name": "str",
+                "description": "Initialized during object creation with a file path that points to a YAML configuration file."
+              }
+            ],
+            "name": "YAMLDataLoader",
+            "location": {
+              "start": 10,
+              "insert": 11,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 10,
+                "end": 13
+              }
+            },
+            "item_type": "class",
+            "length": 29,
+            "docLength": 3
+          },
+          {
+            "id": "f64236f2-f5e5-aca3-5c4c-6151fab4f99f",
+            "ancestors": [
+              "87c5f6b2-c760-65bb-b446-6b8f524ab5d2"
+            ],
+            "description": "Attempts to load YAML data from a file at a specified filepath. If successful, it returns the loaded data; otherwise, it raises various exceptions depending on the nature of the error encountered during loading.",
+            "params": [],
+            "returns": {
+              "type_name": "Any",
+              "description": "The parsed YAML data loaded from a file specified by `self.filepath`, if the loading process is successful. If not, it raises various exceptions depending on the error encountered during the loading process."
+            },
+            "usage": {
+              "language": "python",
+              "code": "yml_loader = YAMLDataLoader(\"path/to/config.yaml\")\nyaml_data = yml_loader.load()\n",
+              "description": "\nThis code snippet creates an instance of YAMLDataLoader with a specific file path and then calls its load method to retrieve the configuration data."
+            },
+            "name": "load",
+            "location": {
+              "start": 22,
+              "insert": 23,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 22,
+                "end": 28
+              }
+            },
+            "item_type": "method",
+            "length": 25,
+            "docLength": 6
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "renderer.py",
+    "path": "rigel/files/renderer.py",
+    "content": {
+      "structured": {
+        "description": "A class called Renderer that is responsible for generating Dockerfiles. It uses Jinja2 templating engine and the pkg_resources package from Python's standard library to load and render templates. The Renderer class takes a DockerSection configuration file as input, which provides information about containerizing a ROS application.",
+        "items": [
+          {
+            "id": "a94002ad-886c-89a0-d94f-216531f140c4",
+            "ancestors": [],
+            "description": "Renders a template file based on a given configuration and saves it to an output file. It uses the Jinja2 templating engine to replace placeholders with actual values from the configuration dictionary.",
+            "attributes": [
+              {
+                "name": "configuration_file",
+                "type_name": "DockerSection",
+                "description": "Initialized during object creation with a specified configuration file. It represents a configuration file for rendering templates."
+              }
+            ],
+            "name": "Renderer",
+            "location": {
+              "start": 6,
+              "insert": 7,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 6,
+                "end": 9
+              }
+            },
+            "item_type": "class",
+            "length": 11,
+            "docLength": 3
+          },
+          {
+            "id": "9def03ed-25cb-9080-d741-0eb0480fce25",
+            "ancestors": [
+              "a94002ad-886c-89a0-d94f-216531f140c4"
+            ],
+            "description": "Generates a Dockerfile from a template and writes it to an output file based on a configuration file, replacing placeholders with actual values.",
+            "params": [
+              {
+                "name": "template",
+                "type_name": "str",
+                "description": "Expected to be a string representing the name of a template file located in the 'assets/templates/' directory."
+              },
+              {
+                "name": "output",
+                "type_name": "str",
+                "description": "Used to specify the path or name of the file where the rendered template will be written."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "renderer = Renderer(DockerSection())\nrenderer.render('dockerfile.j2', 'output.txt')\n",
+              "description": "\nThis code creates a new instance of the Renderer class, passing in a DockerSection configuration file. Then it calls the render method with two parameters: the name of a template ('dockerfile.j2') and the desired output filename ('output.txt')."
+            },
+            "name": "render",
+            "location": {
+              "start": 18,
+              "insert": 19,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 18,
+                "end": 27
+              }
+            },
+            "item_type": "method",
+            "length": 7,
+            "docLength": 9
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "__init__.py",
+    "path": "rigel/models/__init__.py",
+    "content": {
+      "structured": {
+        "description": "Various import statements. It imports DockerfileSection, DockerSection, SSHKey, and SUPPORTED_PLATFORMS from a docker module. Additionally, it imports PluginSection, Rigelfile, and SimulationSection from other modules. These imports suggest that this code is part of a larger project focused on building or managing containerized environments using technologies like Docker.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "docker.py",
+    "path": "rigel/models/docker.py",
+    "content": {
+      "structured": {
+        "description": "Several classes to manage Docker image building and containerization for ROS (Robot Operating System) applications. It utilizes Pydantic for data modeling and validation, as well as the RigelCore exceptions package. The code allows users to specify various parameters such as compiler, platforms, and registry information to build Docker images.",
+        "items": [
+          {
+            "id": "5fd849a3-0653-ae97-324f-95ffdc96a2c4",
+            "ancestors": [],
+            "description": "Validates the `value` field based on whether a `file` field is present or not. If `file` is False, it checks if the `value` corresponds to an existing environment variable; otherwise, it does nothing.",
+            "attributes": [
+              {
+                "name": "file",
+                "type_name": "bool",
+                "description": "Initially set to False. It represents a boolean value indicating whether the 'value' field concerns a file path rather than an environment variable."
+              },
+              {
+                "name": "hostname",
+                "type_name": "str",
+                "description": "Required for the object. Its purpose is not explicitly described, but based on the context of SSH keys, it likely represents the hostname or host identifier associated with the key."
+              },
+              {
+                "name": "value",
+                "type_name": "str",
+                "description": "Validated using a validator function `ensure_valid_value`. The validator checks if `value` refers to an environment variable when `file` is False, raising an error if the environment variable does not exist."
+              }
+            ],
+            "name": "SSHKey",
+            "location": {
+              "start": 20,
+              "insert": 21,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 20,
+                "end": 30
+              }
+            },
+            "item_type": "class",
+            "length": 15,
+            "docLength": 10
+          },
+          {
+            "id": "b368824e-d40e-708f-4740-daa589374fe5",
+            "ancestors": [
+              "5fd849a3-0653-ae97-324f-95ffdc96a2c4"
+            ],
+            "description": "Validates if a given value (v) represents an environment variable and if not, checks if it exists as an environment variable. If it does not exist, it raises an error. Otherwise, it returns the original value.",
+            "params": [
+              {
+                "name": "v",
+                "type_name": "str",
+                "description": "Bound to the value provided for the 'value' key in the input data during validation."
+              },
+              {
+                "name": "values",
+                "type_name": "Dict[str, Any]",
+                "description": "Expected to be passed from the parent class or function. It contains key-value pairs where keys are variable names and values are their corresponding variable values."
+              }
+            ],
+            "returns": {
+              "type_name": "str",
+              "description": "Either unchanged or raised an error, depending on whether it corresponds to a valid environment variable."
+            },
+            "usage": {
+              "language": "python",
+              "code": "ssh_key = SSHKey(file=True, hostname='example.com', value='ssh-rsa key_content')\n",
+              "description": "\nThis code initializes an instance of the SSHKey class with its properties: file (set to True), hostname ('example.com'), and value ('ssh-rsa key_content')."
+            },
+            "name": "ensure_valid_value",
+            "location": {
+              "start": 40,
+              "insert": 42,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 41,
+                "end": 51
+              }
+            },
+            "item_type": "method",
+            "length": 6,
+            "docLength": 10
+          },
+          {
+            "id": "d704168b-4340-2999-1f49-abb2ab2e2520",
+            "ancestors": [],
+            "description": "Defines a data model for storing registry information, comprising three attributes: `password`, `server`, and `username`. These attributes are likely used to authenticate connections to a server or database, specifying credentials and host details.",
+            "attributes": [
+              {
+                "name": "password",
+                "type_name": "str",
+                "description": "Required. It represents a string value that corresponds to a password for a registry server. The exact usage or validation of this password is not specified within the provided code snippet."
+              },
+              {
+                "name": "server",
+                "type_name": "str",
+                "description": "A string that represents the name or address of a server, which is used to connect to for authentication purposes."
+              },
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "A property of the model. It represents a string value that will be stored when creating or updating an instance of this model."
+              }
+            ],
+            "name": "Registry",
+            "location": {
+              "start": 58,
+              "insert": 59,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 58,
+                "end": 68
+              }
+            },
+            "item_type": "class",
+            "length": 4,
+            "docLength": 10
+          },
+          {
+            "id": "bde97b1e-1233-a69a-4a4f-07111d6c4e67",
+            "ancestors": [],
+            "description": "Defines a model for representing Docker configuration options, including required fields like command, distro, and image, as well as optional fields like ros_image, apt packages, and compiler. It also provides validation for certain fields to ensure compliance with Rigel's supported compilers and platforms.",
+            "attributes": [
+              {
+                "name": "command",
+                "type_name": "str",
+                "description": "Required, indicating that it must be specified when creating an instance of the class."
+              },
+              {
+                "name": "distro",
+                "type_name": "str",
+                "description": "Required. It represents a string indicating the Linux distribution, which is used to determine the ROS image if `ros_image` is not provided."
+              },
+              {
+                "name": "image",
+                "type_name": "str",
+                "description": "Required. It represents the name or identifier of a Docker image."
+              },
+              {
+                "name": "package",
+                "type_name": "str",
+                "description": "Required. It represents the name of a ROS package that needs to be installed inside the Docker image."
+              },
+              {
+                "name": "ros_image",
+                "type_name": "str",
+                "description": "Optional. It defaults to the value of the `distro` attribute if not provided separately."
+              },
+              {
+                "name": "apt",
+                "type_name": "List[str]",
+                "description": "Optional, which means it has a default value (an empty list). This attribute is used to specify packages that need to be installed via apt package manager in the Docker image."
+              },
+              {
+                "name": "compiler",
+                "type_name": "str",
+                "description": "Initialized with a default value 'catkin_make'. Its validation ensures that the specified ROS package compiler is supported by Rigel, currently only 'catkin' and 'colcon' are allowed."
+              },
+              {
+                "name": "dir",
+                "type_name": "str",
+                "description": "Optional, with a default value of an empty string ''. It represents the directory path where the Docker image should be created."
+              },
+              {
+                "name": "entrypoint",
+                "type_name": "List[str]",
+                "description": "Optional. It allows multiple strings representing commands to be executed when running a Docker container. The order of these commands matters, as they will be executed one after another."
+              },
+              {
+                "name": "env",
+                "type_name": "List[Dict[str, Any]]",
+                "description": "Optional. It represents a list of environment variables that are set within the Docker container. The variable name is a string key and the value can be any type (Any)."
+              },
+              {
+                "name": "hostname",
+                "type_name": "List[str]",
+                "description": "Optional. It represents a list of hostnames that can be used as environment variables for the Docker container."
+              },
+              {
+                "name": "platforms",
+                "type_name": "List[str]",
+                "description": "Optional. It specifies a list of architectures for which to build the Docker image. The validator function ensures that all listed platforms are supported by the current default builder."
+              },
+              {
+                "name": "rosinstall",
+                "type_name": "List[str]",
+                "description": "Optional. It allows specification of one or more ROS packages to install within a Docker container, which can be used for building and testing purposes."
+              },
+              {
+                "name": "registry",
+                "type_name": "Optional[Registry]",
+                "description": "Optional, meaning it may or may not be present when creating a new instance of this class."
+              },
+              {
+                "name": "run",
+                "type_name": "List[str]",
+                "description": "Optional. It represents a list of commands that should be executed when running the Docker image."
+              },
+              {
+                "name": "ssh",
+                "type_name": "List[SSHKey]",
+                "description": "Optional. It represents a list of SSH keys used for secure communication with remote Docker registries or servers."
+              },
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "Set to 'rigeluser' by default. It represents the username used when running commands inside a Docker container."
+              }
+            ],
+            "name": "DockerSection",
+            "location": {
+              "start": 74,
+              "insert": 75,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 74,
+                "end": 111
+              }
+            },
+            "item_type": "class",
+            "length": 55,
+            "docLength": 37
+          },
+          {
+            "id": "1e9dfca1-663f-478b-654f-e550e217df84",
+            "ancestors": [
+              "bde97b1e-1233-a69a-4a4f-07111d6c4e67"
+            ],
+            "description": "Initializes an object by calling its superclass's constructor with the provided arguments and keyword-arguments. It also sets a 'ros_image' attribute if it is not already set, based on a 'distro' argument.",
+            "params": [
+              {
+                "name": "*args",
+                "type_name": "Any",
+                "description": "List of positional arguments"
+              },
+              {
+                "name": "**kwargs",
+                "type_name": "Any",
+                "description": "Dictionary of keyword arguments"
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "docker_section = DockerSection(command=\"rosrun\", distro=\"Ubuntu\", package=\"example\")",
+              "description": ""
+            },
+            "name": "__init__",
+            "location": {
+              "start": 133,
+              "insert": 134,
+              "offset": " ",
+              "indent": 8,
+              "comment": null
+            },
+            "item_type": "constructor",
+            "length": 4,
+            "docLength": null
+          },
+          {
+            "id": "65672bf8-fecf-e89c-2342-29e28641e3de",
+            "ancestors": [
+              "bde97b1e-1233-a69a-4a4f-07111d6c4e67"
+            ],
+            "description": "Validates whether a given compiler name is either \"catkin_make\" or \"colcon\". If not, it raises an UnsupportedCompilerError with the provided compiler as an argument; otherwise, it returns the validated compiler name.",
+            "params": [
+              {
+                "name": "compiler",
+                "type_name": "str",
+                "description": "Validated to be either 'catkin_make' or 'colcon'. If not, an `UnsupportedCompilerError` is raised with the provided compiler as an argument."
+              }
+            ],
+            "returns": {
+              "type_name": "str",
+              "description": "Either \"catkin\" or \"colcon\". The returned value is the validated compiler, and if it's valid then it remains unchanged; otherwise, an exception is raised."
+            },
+            "usage": {
+              "language": "python",
+              "code": "docker_section = DockerSection(command='run', distro='bionic', package='my_package')\n",
+              "description": ""
+            },
+            "name": "validate_compiler",
+            "location": {
+              "start": 138,
+              "insert": 140,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 139,
+                "end": 145
+              }
+            },
+            "item_type": "method",
+            "length": 6,
+            "docLength": 6
+          },
+          {
+            "id": "2d659782-88e7-c69d-8048-b3a5af1872a6",
+            "ancestors": [
+              "bde97b1e-1233-a69a-4a4f-07111d6c4e67"
+            ],
+            "description": "Validates a list of platform names against a predefined set of supported platforms. If an unsupported platform is found, it raises an UnsupportedPlatformError; otherwise, it returns the original list.",
+            "params": [
+              {
+                "name": "platforms",
+                "type_name": "List[str]",
+                "description": "Expected to be a list of strings representing platform names."
+              }
+            ],
+            "returns": {
+              "type_name": "List[str]",
+              "description": "The input list of platforms after validation. If no exceptions are raised, it means that all elements in the list are valid platforms supported by the system, so the original list is returned unchanged."
+            },
+            "usage": {
+              "language": "python",
+              "code": "docker_section = DockerSection(command='echo \"Hello\"', platforms=['x86_64', 'armv7l', 'i386'])\n",
+              "description": ""
+            },
+            "name": "validate_platforms",
+            "location": {
+              "start": 151,
+              "insert": 153,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 152,
+                "end": 160
+              }
+            },
+            "item_type": "method",
+            "length": 7,
+            "docLength": 8
+          },
+          {
+            "id": "eaef9df7-0ec9-4b8d-6542-ab68e96cac5a",
+            "ancestors": [],
+            "description": "Defines a model for representing a Dockerfile section, which is used to build an image from a package. It requires three fields: `dockerfile`, `image`, and `package`. The optional `registry` field allows specifying the registry where the image will be pushed.",
+            "attributes": [
+              {
+                "name": "dockerfile",
+                "type_name": "str",
+                "description": "Required. It represents the Dockerfile path or content as a string, which defines the instructions for building a Docker image."
+              },
+              {
+                "name": "image",
+                "type_name": "str",
+                "description": "A required field, meaning it must be provided when creating an instance of this class. It represents a Docker image name or ID."
+              },
+              {
+                "name": "package",
+                "type_name": "str",
+                "description": "Required. It represents a package name, indicating which package should be installed or built during the Docker image build process."
+              },
+              {
+                "name": "registry",
+                "type_name": "Optional[Registry]",
+                "description": "Optional, meaning it can be present or absent when an instance of DockerfileSection is created."
+              }
+            ],
+            "name": "DockerfileSection",
+            "location": {
+              "start": 168,
+              "insert": 169,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 168,
+                "end": 180
+              }
+            },
+            "item_type": "class",
+            "length": 8,
+            "docLength": 12
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "plugin.py",
+    "path": "rigel/models/plugin.py",
+    "content": {
+      "structured": {
+        "description": "A class called `PluginSection` that represents information about an external plugin for Rigel. The class uses Pydantic's `BaseModel` and validates the name of the plugin using a custom validator function. The plugin information includes its name, a list of arguments to be passed to the entrypoint class, the name of the entrypoint class itself, and positional arguments.",
+        "items": [
+          {
+            "id": "33d8e54e-6a03-2caa-5d47-1c435821e7f8",
+            "ancestors": [],
+            "description": "Defines a model for a plugin, which includes required and optional fields. The required field is `name`, while `args`, `entrypoint`, and `kwargs` are optional. It also contains a validator to ensure the format of the plugin name is in the format `<AUTHOR>/<PACKAGE>`.",
+            "attributes": [
+              {
+                "name": "name",
+                "type_name": "str",
+                "description": "Required to be filled. It must conform to the format <AUTHOR>/<PACKAGE>."
+              },
+              {
+                "name": "args",
+                "type_name": "List[Any]",
+                "description": "Initialized with a default value of an empty list. This means it can be used to store any number of arguments that are passed when using this plugin."
+              },
+              {
+                "name": "entrypoint",
+                "type_name": "str",
+                "description": "Initialized with a default value 'Plugin'. This means that when an instance of `PluginSection` is created, the `entrypoint` attribute will be set to 'Plugin' unless otherwise specified."
+              },
+              {
+                "name": "kwargs",
+                "type_name": "Dict[str, Any]",
+                "description": "Initialized to an empty dictionary. It allows for arbitrary keyword arguments that can be passed when creating a plugin section."
+              }
+            ],
+            "name": "PluginSection",
+            "location": {
+              "start": 6,
+              "insert": 7,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 6,
+                "end": 26
+              }
+            },
+            "item_type": "class",
+            "length": 19,
+            "docLength": 20
+          },
+          {
+            "id": "4bf8cc44-4b3c-b9a4-574e-e1d18eedfb23",
+            "ancestors": [
+              "33d8e54e-6a03-2caa-5d47-1c435821e7f8"
+            ],
+            "description": "Validates the input 'name' as follows: if the length of the name, after stripping leading and trailing whitespace and splitting by '/', is not equal to 2, it raises an InvalidPluginNameError; otherwise, it returns the original name.",
+            "params": [
+              {
+                "name": "name",
+                "type_name": "str",
+                "description": "Validated by this method. The validation checks if the name contains exactly one slash (`/`) and returns the original name if valid, or raises an exception otherwise."
+              }
+            ],
+            "returns": {
+              "type_name": "str",
+              "description": "The validated input name. If the validation fails, it raises an exception and doesn't return any result."
+            },
+            "usage": {
+              "language": "python",
+              "code": "plugin_section = PluginSection(name=\"user1/plugin1\")\n",
+              "description": "\nIn this example, a new instance of PluginSection named plugin_section is created with name \"user1/plugin1\""
+            },
+            "name": "validate_name",
+            "location": {
+              "start": 35,
+              "insert": 37,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 36,
+                "end": 41
+              }
+            },
+            "item_type": "method",
+            "length": 5,
+            "docLength": 5
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "rigelfile.py",
+    "path": "rigel/models/rigelfile.py",
+    "content": {
+      "structured": {
+        "description": "A Rigelfile class using Pydantic's BaseModel, which serves as a placeholder for information used by Rigel to containerize ROS applications. The class consists of four sections: packages, deploy, simulate, and vars, each containing specific information about containerization, deployment, simulation, and global variables respectively.",
+        "items": [
+          {
+            "id": "4aedab89-3133-4e97-3c4e-8c7744589819",
+            "ancestors": [],
+            "description": "Defines a model for a Rigel configuration file. It consists of required and optional sections. The required section is \"packages\", which accepts at least one declaration from either `DockerSection` or `DockerfileSection`. Optional sections include \"deploy\", \"simulate\", and \"vars\".",
+            "attributes": [
+              {
+                "name": "packages",
+                "type_name": "List[Union[DockerSection, DockerfileSection]]",
+                "description": "Required to have at least one package declaration."
+              },
+              {
+                "name": "deploy",
+                "type_name": "List[PluginSection]",
+                "description": "Optional. It represents a list of plugin sections that are used for deployment purposes, and can be empty if no plugins are required."
+              },
+              {
+                "name": "simulate",
+                "type_name": "Optional[SimulationSection]",
+                "description": "Optional. It represents a Simulation Section that can be used to simulate deployment operations."
+              },
+              {
+                "name": "vars",
+                "type_name": "Dict[str, Any]",
+                "description": "Optional. It represents a dictionary that maps strings to any data type, allowing for flexible storage and retrieval of variables with string keys."
+              }
+            ],
+            "name": "Rigelfile",
+            "location": {
+              "start": 8,
+              "insert": 9,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 8,
+                "end": 28
+              }
+            },
+            "item_type": "class",
+            "length": 8,
+            "docLength": 20
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "simulation.py",
+    "path": "rigel/models/simulation.py",
+    "content": {
+      "structured": {
+        "description": "A class SimulationSection using Pydantic's BaseModel, which represents information about simulations using containerized ROS nodes. The simulation section holds required and optional fields, including a list of plugins and their associated requirements for simulation assessment.",
+        "items": [
+          {
+            "id": "14ca6856-8f45-2d98-5248-516cbc0e454c",
+            "ancestors": [],
+            "description": "Defines a simulation section in a model, containing required and optional fields. It consists of a list of plugins (`plugins`) and has two optional attributes: an introspection list (`introspection`) and a timeout value (`timeout`).",
+            "attributes": [
+              {
+                "name": "plugins",
+                "type_name": "List[PluginSection]",
+                "description": "Required. It represents a list of plugin sections."
+              },
+              {
+                "name": "introspection",
+                "type_name": "List[str]",
+                "description": "Optional. It represents a list of strings that provides additional information about the simulation. The default value for this attribute is an empty list if not provided."
+              },
+              {
+                "name": "timeout",
+                "type_name": "int",
+                "description": "60 seconds by default, indicating the maximum time allowed for a simulation to run before it times out."
+              }
+            ],
+            "name": "SimulationSection",
+            "location": {
+              "start": 6,
+              "insert": 7,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 6,
+                "end": 14
+              }
+            },
+            "item_type": "class",
+            "length": 7,
+            "docLength": 8
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "__init__.py",
+    "path": "rigel/plugins/__init__.py",
+    "content": {
+      "structured": {
+        "description": "Imports for three modules: PluginInstaller, PluginLoader, and Plugin from a package. The PluginInstaller module is responsible for installing plugins into a system. The PluginLoader module loads and manages plugin instances. The Plugin class represents a plugin itself, encapsulating its functionality and metadata.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "installer.py",
+    "path": "rigel/plugins/installer.py",
+    "content": {
+      "structured": {
+        "description": "A class called PluginInstaller which is responsible for installing external plugins from both public and private sources. It takes plugin name, host and whether it's private as parameters in its constructor. The install method uses pip package manager to download and install the plugin using either ssh or https protocol based on the private parameter.",
+        "items": [
+          {
+            "id": "0554481e-88d2-a888-8549-2a22f7b55a42",
+            "ancestors": [],
+            "description": "Installs an external plugin by downloading and installing it using pip. It takes a plugin name, host, and a boolean indicating whether to use SSH or HTTPS protocol as input parameters.",
+            "attributes": [
+              {
+                "name": "plugin",
+                "type_name": "str",
+                "description": "Initialized with a plugin name passed to the constructor. It is further processed by splitting it into a user name and a plugin name."
+              },
+              {
+                "name": "plugin_user",
+                "type_name": "str|None",
+                "description": "Calculated during the initialization process by splitting the provided plugin string using '/' as a separator and taking the first part. It represents the user part of the plugin name."
+              },
+              {
+                "name": "plugin_name",
+                "type_name": "str",
+                "description": "Obtained by splitting the `plugin` string with '/' as a delimiter, provided that the plugin name can be split correctly; otherwise, it raises an error."
+              },
+              {
+                "name": "host",
+                "type_name": "str",
+                "description": "Initialized by passing a value to its constructor. It represents the host where the plugin resides, and it can be either an SSH or HTTPS URL depending on the `private` attribute."
+              },
+              {
+                "name": "protocol",
+                "type_name": "str|ssh|https",
+                "description": "Determined by the value of the `private` parameter passed during initialization. If `private` is True, it defaults to 'ssh', otherwise it defaults to 'https'."
+              }
+            ],
+            "name": "PluginInstaller",
+            "location": {
+              "start": 9,
+              "insert": 10,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 9,
+                "end": 12
+              }
+            },
+            "item_type": "class",
+            "length": 20,
+            "docLength": 3
+          },
+          {
+            "id": "d38225fc-57ad-b78e-ca4a-132a566ef769",
+            "ancestors": [
+              "0554481e-88d2-a888-8549-2a22f7b55a42"
+            ],
+            "description": "Initializes an instance by setting plugin, host, and protocol properties. It splits the plugin name from the input string, raises an error if not valid, sets the default protocol as 'ssh' for private plugins or 'https' otherwise.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "str",
+                "description": "Used to initialize an object with plugin information. It is expected to be in the format `/plugin_name` or `/user/plugin_name`, where `plugin_name` is the name of the plugin."
+              },
+              {
+                "name": "host",
+                "type_name": "str",
+                "description": "Assigned to an instance variable named `self.host`. It is expected to be a string value representing a host or server name."
+              },
+              {
+                "name": "private",
+                "type_name": "bool",
+                "description": "Used to specify whether the connection should be made using SSH or HTTPS protocols, depending on its value being True or False."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "installer = PluginInstaller(\"github.com/user1/plugin_name\", \"github.com\", False)\ninstaller.install()\n",
+              "description": "\nNote: In this example, it's assumed that the plugin is publicly available and not private."
+            },
+            "name": "__init__",
+            "location": {
+              "start": 14,
+              "insert": 15,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 14,
+                "end": 23
+              }
+            },
+            "item_type": "constructor",
+            "length": 8,
+            "docLength": 9
+          },
+          {
+            "id": "347f1576-5d9f-58a6-f74a-9269d5bd34ef",
+            "ancestors": [
+              "0554481e-88d2-a888-8549-2a22f7b55a42"
+            ],
+            "description": "Installs a plugin from a Git repository using pip. The URL for the repository is constructed based on the protocol and other attributes of the class. If installation fails, it raises a PluginInstallationError exception.",
+            "params": [],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "installer = PluginInstaller('my_plugin/branch', 'github.com', True)\ninstaller.install()\n",
+              "description": ""
+            },
+            "name": "install",
+            "location": {
+              "start": 32,
+              "insert": 33,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 32,
+                "end": 35
+              }
+            },
+            "item_type": "method",
+            "length": 7,
+            "docLength": 3
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "loader.py",
+    "path": "rigel/plugins/loader.py",
+    "content": {
+      "structured": {
+        "description": "A class called `PluginLoader` which is responsible for dynamically loading and verifying the compliance of external plugins at runtime. The class utilizes the `importlib` package to import modules and inspect the signatures of methods declared within them using the `inspect` package. The plugins are validated against certain criteria, including whether they implement specific functions (`run` and `stop`) with the correct parameters.",
+        "items": [
+          {
+            "id": "cc9954c3-3ca4-7f87-6c4f-103b785902ae",
+            "ancestors": [],
+            "description": "Validates and loads plugins. It checks if a plugin's entrypoint is compliant with specified methods, then imports and initializes it using the `ModelBuilder`. If not compliant, it raises an error.",
+            "attributes": [],
+            "name": "PluginLoader",
+            "location": {
+              "start": 13,
+              "insert": 14,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 13,
+                "end": 16
+              }
+            },
+            "item_type": "class",
+            "length": 44,
+            "docLength": 3
+          },
+          {
+            "id": "1b1f442d-67b3-ae81-7940-f8460fe6d378",
+            "ancestors": [
+              "cc9954c3-3ca4-7f87-6c4f-103b785902ae"
+            ],
+            "description": "Checks whether an entrypoint's run method complies with the requirement that it has exactly one parameter, excluding the implicit 'self' parameter. It returns True if compliant and False otherwise.",
+            "params": [
+              {
+                "name": "entrypoint",
+                "type_name": "Type",
+                "description": "An object representing a callable Python function, specifically the entry point to be checked for compliance with the Run protocol."
+              }
+            ],
+            "returns": {
+              "type_name": "bool",
+              "description": "True if the entrypoint's run method has exactly one parameter, excluding 'self', and False otherwise."
+            },
+            "usage": {
+              "language": "python",
+              "code": "loader = PluginLoader()\nentrypoint = MyPluginClass().run\nif loader.is_run_compliant(entrypoint):\n    print(\"Entry point compliant\")\nelse:\n    print(\"Entry point not compliant\")",
+              "description": ""
+            },
+            "name": "is_run_compliant",
+            "location": {
+              "start": 33,
+              "insert": 34,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 33,
+                "end": 44
+              }
+            },
+            "item_type": "method",
+            "length": 3,
+            "docLength": 11
+          },
+          {
+            "id": "069cf8c4-9f9a-0386-0645-f2d0a5130fcc",
+            "ancestors": [
+              "cc9954c3-3ca4-7f87-6c4f-103b785902ae"
+            ],
+            "description": "Checks if an entrypoint's stop method conforms to the stop protocol, i.e., it takes exactly one argument besides self.",
+            "params": [
+              {
+                "name": "entrypoint",
+                "type_name": "Type",
+                "description": "An object that represents a class, which has a method named `stop`. This method's signature is inspected to determine if it complies with certain requirements."
+              }
+            ],
+            "returns": {
+              "type_name": "bool",
+              "description": "True if the `stop` method of the `entrypoint` object has exactly one parameter (excluding `self`), and False otherwise."
+            },
+            "usage": {
+              "language": "python",
+              "code": "plugin_loader = PluginLoader()\nentrypoint = MyPlugin()\nif plugin_loader.is_stop_compliant(entrypoint):\n    pass  # do something if compliant\nelse:\n    pass  # handle non-compliance",
+              "description": ""
+            },
+            "name": "is_stop_compliant",
+            "location": {
+              "start": 48,
+              "insert": 49,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 48,
+                "end": 59
+              }
+            },
+            "item_type": "method",
+            "length": 3,
+            "docLength": 11
+          },
+          {
+            "id": "289313c2-3fac-5fa1-724b-5d4872cd6b75",
+            "ancestors": [
+              "cc9954c3-3ca4-7f87-6c4f-103b785902ae"
+            ],
+            "description": "Loads and validates a plugin by importing its module, checking its compliance with required attributes and methods, and then building an instance of the plugin using its arguments and keyword arguments.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "PluginSection",
+                "description": "Expected to have a name attribute which is a string representing the path of the plugin module followed by the entrypoint class, for example \"path/to/plugin/my_plugin\"."
+              }
+            ],
+            "returns": {
+              "type_name": "Any",
+              "description": "An instance of a class built by `ModelBuilder`. The instance is constructed with arguments and keyword arguments passed from the `plugin.args` and `plugin.kwargs`."
+            },
+            "usage": {
+              "language": "python",
+              "code": "plugin_loader = PluginLoader()\nplugin_section = PluginSection(name='my_plugin', entrypoint='MyPlugin')\nresult = plugin_loader.load(plugin_section)\n",
+              "description": ""
+            },
+            "name": "load",
+            "location": {
+              "start": 64,
+              "insert": 65,
+              "offset": " ",
+              "indent": 8,
+              "comment": {
+                "start": 64,
+                "end": 73
+              }
+            },
+            "item_type": "method",
+            "length": 31,
+            "docLength": 9
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "plugin.py",
+    "path": "rigel/plugins/plugin.py",
+    "content": {
+      "structured": {
+        "description": "An abstract protocol named Plugin using Python's Protocol and runtime_checkable decorators from typing module. It specifies two methods: run and stop that any concrete implementation must adhere to. These methods serve as entry points for plugin execution and cleanup respectively.",
+        "items": [
+          {
+            "id": "e29af27d-8d75-f088-774a-fc716b43286a",
+            "ancestors": [],
+            "description": "Defines a protocol for plugins that can be executed and stopped. It consists of two methods: `run`, which initiates the plugin's execution, and `stop`, which terminates its operation.",
+            "attributes": [],
+            "name": "Plugin",
+            "location": {
+              "start": 4,
+              "insert": 6,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 5,
+                "end": 8
+              }
+            },
+            "item_type": "class",
+            "length": 7,
+            "docLength": 3
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "__init__.py",
+    "path": "rigel/__init__.py",
+    "content": {
+      "structured": {
+        "description": "A set of exceptions and imports several modules from within its own package structure. The exceptions relate to various errors that may occur during plugin installation and usage.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "cli.py",
+    "path": "rigel/cli.py",
+    "content": {
+      "structured": {
+        "description": "A Rigel application that utilizes Docker and ROS (Robot Operating System) to containerize and deploy ROS applications. The application includes various commands for creating Rigelfiles, building Docker images, deploying containers, running simulations, installing plugins, and more. It leverages high-level packages such as Click, YAMLDataLoader, ModelBuilder, PluginLoader, and SimulationRequirementsManager to manage these tasks.",
+        "items": [
+          {
+            "id": "ffb35f66-6f8b-a8ba-8447-f98f2cedbe13",
+            "ancestors": [],
+            "description": "Logs an instance of `RigelError` using an `ErrorLogger` object and then terminates the program with a specific exit code corresponding to the error.",
+            "params": [
+              {
+                "name": "err",
+                "type_name": "RigelError",
+                "description": "Required for the function to run successfully."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "err = RigelError(\"An error has occurred\")\nhandle_rigel_error(err)",
+              "description": ""
+            },
+            "name": "handle_rigel_error",
+            "location": {
+              "start": 32,
+              "insert": 33,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 32,
+                "end": 37
+              }
+            },
+            "item_type": "function",
+            "length": 4,
+            "docLength": 5
+          },
+          {
+            "id": "1a37b3d7-5424-6b93-1c4d-4d79006000ba",
+            "ancestors": [],
+            "description": "Loads a YAML file named 'Rigelfile' using `YAMLDataLoader`, decodes its content with `YAMLDataDecoder`, and then uses it to build an object with `ModelBuilder`. The result is returned as the output of this function.",
+            "params": [],
+            "returns": {
+              "type_name": "Any",
+              "description": "An instance of a class representing a model, built using data loaded from a YAML file and decoded by a YAML decoder."
+            },
+            "usage": {
+              "language": "python",
+              "code": "result = parse_rigelfile()\n# Use the result as needed\n",
+              "description": ""
+            },
+            "name": "parse_rigelfile",
+            "location": {
+              "start": 54,
+              "insert": 55,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 54,
+                "end": 60
+              }
+            },
+            "item_type": "function",
+            "length": 8,
+            "docLength": 6
+          },
+          {
+            "id": "96a976a5-dbcc-daa8-2245-09cfa20701ef",
+            "ancestors": [],
+            "description": "Loads an external plugin into a Rigel application, overriding its command-line arguments and keyword arguments with those provided by the application if specified. It logs a warning message and handles errors during the loading process.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "PluginSection",
+                "description": "Expected to be an instance of a class representing a plugin."
+              },
+              {
+                "name": "application_args",
+                "type_name": "List[Any]",
+                "description": "Used to pass command-line arguments to an external plugin. It allows the plugin to be initialized with additional values from the application's command line interface."
+              },
+              {
+                "name": "application_kwargs",
+                "type_name": "Dict[str, Any]",
+                "description": "Used to specify keyword arguments for the plugin instance being loaded. These arguments are updated in the plugin's kwargs attribute."
+              }
+            ],
+            "returns": {
+              "type_name": "Tuple[str, Plugin]",
+              "description": "A tuple containing two elements: the first element is a string representing the name of the loaded plugin and the second element is an instance of the loaded plugin."
+            },
+            "usage": {
+              "language": "python",
+              "code": "plugin = PluginSection(name='MyPlugin')\nresult = load_plugin(plugin, ['arg1', 'arg2'], {'kwarg1': 1})\n",
+              "description": ""
+            },
+            "name": "load_plugin",
+            "location": {
+              "start": 80,
+              "insert": 85,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 84,
+                "end": 97
+              }
+            },
+            "item_type": "function",
+            "length": 22,
+            "docLength": 13
+          },
+          {
+            "id": "2da9becd-0ffc-cba3-6347-ced879b0081a",
+            "ancestors": [],
+            "description": "Executes an external plugin, runs it until its termination, and handles any interruptions or termination requests. It logs messages at different stages of plugin execution and termination, and catches any RigelError exceptions for further processing.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "Tuple[str, Plugin]",
+                "description": "Expected to contain exactly two elements: a string representing the name of the plugin, and an instance of the Plugin class."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "run_plugin((\"my_plugin\", MyPluginInstance()))\n",
+              "description": ""
+            },
+            "name": "run_plugin",
+            "location": {
+              "start": 117,
+              "insert": 118,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 117,
+                "end": 123
+              }
+            },
+            "item_type": "function",
+            "length": 21,
+            "docLength": 6
+          },
+          {
+            "id": "0419c305-050e-48ac-e248-480b95c036a9",
+            "ancestors": [
+              "2da9becd-0ffc-cba3-6347-ced879b0081a"
+            ],
+            "description": "Terminates a plugin instance and logs a message indicating graceful shutdown. It then exits the program with exit code 0, indicating successful termination. The function accepts any number of arguments, but does not use them.",
+            "params": [
+              {
+                "name": "*args",
+                "type_name": "Any",
+                "description": "List of positional arguments"
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "plugin_instance.stop_plugin('my_plugin')",
+              "description": ""
+            },
+            "name": "stop_plugin",
+            "location": {
+              "start": 128,
+              "insert": 129,
+              "offset": " ",
+              "indent": 12,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 4,
+            "docLength": null
+          },
+          {
+            "id": "5f931ec3-ae42-c696-1844-2167e3ee72ff",
+            "ancestors": [],
+            "description": "Runs a plugin in an external process, managing its execution and shutdown. It catches any exceptions raised by the plugin, logs relevant messages, and stops the plugin gracefully when interrupted or finished executing.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "Tuple[str, Plugin]",
+                "description": "Unpacked into two variables: `plugin_name` and `plugin_instance`. It represents an external plugin with its name and instance."
+              },
+              {
+                "name": "manager",
+                "type_name": "SimulationRequirementsManager",
+                "description": "Used to monitor the state of the simulation, specifically whether it has finished or not."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "plugin = (\"example\", ExamplePlugin())\nmanager = SimulationRequirementsManager()\nrun_simulation_plugin(plugin, manager)",
+              "description": ""
+            },
+            "name": "run_simulation_plugin",
+            "location": {
+              "start": 146,
+              "insert": 150,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 149,
+                "end": 159
+              }
+            },
+            "item_type": "function",
+            "length": 29,
+            "docLength": 10
+          },
+          {
+            "id": "8da9fc36-9064-b994-1c4f-0b2098d4f640",
+            "ancestors": [
+              "5f931ec3-ae42-c696-1844-2167e3ee72ff"
+            ],
+            "description": "Terminates a plugin instance and logs a message to indicate graceful termination. It takes any number of arguments, stops the plugin using its `stop` method, and then exits the program with exit code 0.",
+            "params": [
+              {
+                "name": "*args",
+                "type_name": "Any",
+                "description": "List of positional arguments"
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "stop_plugin('plugin_name')\n",
+              "description": ""
+            },
+            "name": "stop_plugin",
+            "location": {
+              "start": 164,
+              "insert": 165,
+              "offset": " ",
+              "indent": 12,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 4,
+            "docLength": null
+          },
+          {
+            "id": "6589b73f-83d2-da9c-d345-2329b0a0e326",
+            "ancestors": [],
+            "description": "Defines a command-line interface using the Click library. It is a group decorator that wraps multiple commands and sub-commands together, allowing users to access them from the terminal with a single prefix.",
+            "params": [],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "@cli.command()\ndef hello():\n    pass\n\nif __name__ == '__main__':\n    cli()",
+              "description": ""
+            },
+            "name": "cli",
+            "location": {
+              "start": 188,
+              "insert": 190,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 189,
+                "end": 192
+              }
+            },
+            "item_type": "function",
+            "length": 3,
+            "docLength": 3
+          },
+          {
+            "id": "52b5a069-763e-0892-3848-3f6d3530e6a3",
+            "ancestors": [],
+            "description": "Initializes a Rigelfile by creating it if it does not exist or overwriting it if it already exists and the `--force` option is specified. It logs success messages and handles any errors that occur during the process.",
+            "params": [
+              {
+                "name": "force",
+                "type_name": "bool",
+                "description": "A flag that controls whether to overwrite an existing Rigelfile or not. When set to True, it allows writing over an existing file; when False (default), it raises an error if the file already exists."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "init(force=True)",
+              "description": ""
+            },
+            "name": "init",
+            "location": {
+              "start": 196,
+              "insert": 199,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 198,
+                "end": 201
+              }
+            },
+            "item_type": "function",
+            "length": 14,
+            "docLength": 3
+          },
+          {
+            "id": "1ab41ae3-20eb-ef99-6047-ad9a905dc4a5",
+            "ancestors": [],
+            "description": "Creates build files for a Docker package by rendering templates into actual files using a Renderer object. It generates a Dockerfile, an entrypoint script, and optionally a configuration file based on input parameters from the `package` object.",
+            "params": [
+              {
+                "name": "package",
+                "type_name": "DockerSection",
+                "description": "Expected to contain information about the package being processed, including its name (`package`) and optional directory path (`dir`)."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "create_package_files(DockerSection(package=\"my-package\", dir=\"/path/to/package\"))\n",
+              "description": ""
+            },
+            "name": "create_package_files",
+            "location": {
+              "start": 215,
+              "insert": 216,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 215,
+                "end": 221
+              }
+            },
+            "item_type": "function",
+            "length": 21,
+            "docLength": 6
+          },
+          {
+            "id": "3cfdf3a6-8bef-f49d-534e-837cc040bae0",
+            "ancestors": [],
+            "description": "Generates a list of desired packages from command-line options and filters them based on a configuration file. It creates package files for selected packages and handles errors if any packages are not found or invalid.",
+            "params": [
+              {
+                "name": "pkg",
+                "type_name": "Tuple[str]",
+                "description": "Optional with multiple values, allowing the user to specify a list of desired packages when calling the command."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "create(pkg=['package1', 'package2'])\n",
+              "description": ""
+            },
+            "name": "create",
+            "location": {
+              "start": 244,
+              "insert": 247,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 246,
+                "end": 249
+              }
+            },
+            "item_type": "function",
+            "length": 21,
+            "docLength": 3
+          },
+          {
+            "id": "d63b7c67-d58f-b8a6-1344-aceba1c2c6d3",
+            "ancestors": [],
+            "description": "Authenticates a Docker registry for a given package by logging into the registry server with provided credentials, and logs any authentication errors.",
+            "params": [
+              {
+                "name": "package",
+                "type_name": "Union[DockerSection, DockerfileSection]",
+                "description": "Expected to be either an instance of DockerSection or DockerfileSection class. This indicates that it accepts different types of objects related to Docker package registries."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "package = DockerSection(server='myregistry.com', username='user123', password='password123')\nlogin_registry(package)",
+              "description": ""
+            },
+            "name": "login_registry",
+            "location": {
+              "start": 272,
+              "insert": 273,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 272,
+                "end": 278
+              }
+            },
+            "item_type": "function",
+            "length": 21,
+            "docLength": 6
+          },
+          {
+            "id": "c0e1d135-96a7-37bf-f241-7e17e463201a",
+            "ancestors": [],
+            "description": "Generates two absolute paths for a given `DockerSection` package. If the package has a directory, it returns the directory and its `.rigel_config` subdirectory. Otherwise, it returns the package name with `.rigel_config/` prefix in both cases.",
+            "params": [
+              {
+                "name": "package",
+                "type_name": "DockerSection",
+                "description": "Referred to as package throughout the code."
+              }
+            ],
+            "returns": {
+              "type_name": "Tuple[str, str]",
+              "description": "A pair of absolute paths. The first path is to a directory and its corresponding '.rigel_config' file if 'package.dir' exists. Otherwise, the path is to '.rigel_config/{package.package}' and its own self."
+            },
+            "usage": {
+              "language": "python",
+              "code": "package = DockerSection(dir='path/to/package', package='my_package')\npath1, path2 = generate_paths(package)",
+              "description": ""
+            },
+            "name": "generate_paths",
+            "location": {
+              "start": 301,
+              "insert": 302,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 7,
+            "docLength": null
+          },
+          {
+            "id": "49b42c86-7154-a983-974d-214780843721",
+            "ancestors": [],
+            "description": "Containerizes a package by building and optionally pushing a Docker image using various configuration files, handles SSH keys, and creates QEMU configurations for supported platforms.",
+            "params": [
+              {
+                "name": "package",
+                "type_name": "DockerSection",
+                "description": "Required for containerizing a package. It contains information such as SSH keys, .rosinstall file, platforms, and image name."
+              },
+              {
+                "name": "load",
+                "type_name": "bool",
+                "description": "Used to specify whether to load the Docker image after it has been built."
+              },
+              {
+                "name": "push",
+                "type_name": "bool",
+                "description": "Optional. It controls whether to push the built Docker image to the registry after building it. If set to True, the image will be pushed; otherwise, it won't."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "package = DockerSection(package='test_package', ssh=['ssh_key1'], platforms=['x86_64'])\ncontainerize_package(package, load=True, push=False)\n",
+              "description": ""
+            },
+            "name": "containerize_package",
+            "location": {
+              "start": 314,
+              "insert": 315,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 314,
+                "end": 324
+              }
+            },
+            "item_type": "function",
+            "length": 60,
+            "docLength": 10
+          },
+          {
+            "id": "49b6636f-70c6-a28b-3245-7ba75fdfc3c6",
+            "ancestors": [],
+            "description": "Creates a Docker image using a provided Dockerfile and registry login information. It builds an image from the specified path, optionally loads it into memory, and pushes it to a registry if necessary, logging informational messages throughout the process.",
+            "params": [
+              {
+                "name": "package",
+                "type_name": "DockerfileSection",
+                "description": "Expected to hold information about a Docker package, including its Dockerfile location (`dockerfile`) and image name (`image`)."
+              },
+              {
+                "name": "load",
+                "type_name": "bool",
+                "description": "Used to specify whether the Docker image should be loaded into memory during the build process or not."
+              },
+              {
+                "name": "push",
+                "type_name": "bool",
+                "description": "Used to specify whether the Docker image should be pushed after building or not. The default behavior depends on the value assigned to this variable."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "build_image(DockerfileSection(dockerfile='path/to/Dockerfile', image='my/image'), load=True, push=False)\n",
+              "description": ""
+            },
+            "name": "build_image",
+            "location": {
+              "start": 390,
+              "insert": 391,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 390,
+                "end": 400
+              }
+            },
+            "item_type": "function",
+            "length": 17,
+            "docLength": 10
+          },
+          {
+            "id": "3fbc6564-7d0c-848f-204c-49dbf6bca08b",
+            "ancestors": [],
+            "description": "Constructs a list of desired packages based on command-line options and parses a configuration file to determine which packages to install, then installs or builds them accordingly, storing results locally or remotely as specified by user input.",
+            "params": [
+              {
+                "name": "pkg",
+                "type_name": "Tuple[str]",
+                "description": "Specified with multiple=True, allowing users to pass a list of desired packages as separate arguments."
+              },
+              {
+                "name": "load",
+                "type_name": "bool",
+                "description": "Flag-like. When set to True, it indicates that the built image should be stored locally. It defaults to False and has a default value of False when not specified."
+              },
+              {
+                "name": "push",
+                "type_name": "bool",
+                "description": "An option for the command. It indicates whether to store built images in a remote registry when set to True, or not (default False) otherwise."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "@click.command()\n@build(pkg=['package1', 'package2'], load=True, push=False)\n",
+              "description": "\nNote that this example uses a decorator syntax to invoke the build function with specific arguments."
+            },
+            "name": "build",
+            "location": {
+              "start": 419,
+              "insert": 424,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 423,
+                "end": 426
+              }
+            },
+            "item_type": "function",
+            "length": 24,
+            "docLength": 3
+          },
+          {
+            "id": "8d85ffaa-3333-3ebf-8147-8535e6f49f39",
+            "ancestors": [],
+            "description": "Deploys a containerized ROS package by parsing a Rigelfile, loading and running plugins defined in it, if any. If no deployment plugin is found, it logs a warning message.",
+            "params": [],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "deploy()\n",
+              "description": ""
+            },
+            "name": "deploy",
+            "location": {
+              "start": 451,
+              "insert": 453,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 452,
+                "end": 455
+              }
+            },
+            "item_type": "function",
+            "length": 13,
+            "docLength": 3
+          },
+          {
+            "id": "93e8a43e-7432-f79d-234a-eb695bb8f0ef",
+            "ancestors": [],
+            "description": "Initializes a ROS application and runs a simulation based on the contents of a rigelfile, which defines plugins to simulate. It parses the file, loads plugins, and executes them with specified requirements and timeout.",
+            "params": [],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "@click.command()\ndef main():\n    run()\n\nif __name__ == '__main__':\n    main()\n",
+              "description": ""
+            },
+            "name": "run",
+            "location": {
+              "start": 470,
+              "insert": 472,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 471,
+                "end": 474
+              }
+            },
+            "item_type": "function",
+            "length": 22,
+            "docLength": 3
+          },
+          {
+            "id": "5196bea1-7ac2-04aa-ce4c-742925e644b0",
+            "ancestors": [],
+            "description": "Installs a plugin on a hosting platform specified by the user. It takes three parameters: the name of the plugin, the URL of the hosting platform (default is 'github.com'), and a boolean indicating whether the plugin is public or private.",
+            "params": [
+              {
+                "name": "plugin",
+                "type_name": "str",
+                "description": "Passed to the function by the user through command-line input. It specifies the name or identifier of the plugin to be installed."
+              },
+              {
+                "name": "host",
+                "type_name": "str",
+                "description": "Optional. It defaults to 'github.com' and specifies the URL of the hosting platform for the plugin. The user can override this default by providing a different value at command invocation time."
+              },
+              {
+                "name": "ssh",
+                "type_name": "bool",
+                "description": "0 by default, meaning it's set to False. When True, it indicates that the plugin is private or not public. It can be enabled or disabled using a flag option."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "install('my_plugin', host='github.com')\n",
+              "description": "\nor\n"
+            },
+            "name": "install",
+            "location": {
+              "start": 499,
+              "insert": 504,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 503,
+                "end": 506
+              }
+            },
+            "item_type": "function",
+            "length": 10,
+            "docLength": 3
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "exceptions.py",
+    "path": "rigel/exceptions.py",
+    "content": {
+      "structured": {
+        "description": "Exceptions and error classes for handling various errors that can occur while using the Rigel system. These errors include file not found, file already exists, unformatted files, incomplete files, empty files, unsupported compilers and platforms, invalid platforms, plugin installation and loading issues, among others. The code uses inheritance to define subclasses of a base class called RigelError for each type of error.",
+        "items": [
+          {
+            "id": "470d91ad-391c-66a8-0942-91df3534f7a6",
+            "ancestors": [],
+            "description": "Defines a custom error type for Rigel applications, indicating that a Rigelfile was not found. It provides a base message and an error code (6) to be used when this error occurs, suggesting the use of the 'rigel init' command to create one.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Set with a default error message. It provides a brief description of the error, which will be used as the basis for constructing a detailed error message when this exception is raised."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "6. It is likely used for error handling purposes, providing a unique identifier or code to distinguish this specific error from others."
+              }
+            ],
+            "name": "RigelfileNotFoundError",
+            "location": {
+              "start": 4,
+              "insert": 5,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 4,
+                "end": 7
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 3
+          },
+          {
+            "id": "458b3f44-ac1e-47ba-6f48-2c320d4ef403",
+            "ancestors": [],
+            "description": "Defines a custom error type for when a Rigel file already exists. It inherits from the `RigelError` class and provides a base message describing the error along with an error code of 7. The error can be resolved by using the '--force' flag.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Set to a string that contains a default error message for this exception. This message explains why the error occurred (a Rigelfile already exists) and provides information on how to handle it."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "7, which likely represents a specific error code used to identify this exception when it occurs."
+              }
+            ],
+            "name": "RigelfileAlreadyExistsError",
+            "location": {
+              "start": 12,
+              "insert": 13,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 12,
+                "end": 16
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 4
+          },
+          {
+            "id": "309c936f-c0c8-caa5-bc4e-845848a1d841",
+            "ancestors": [],
+            "description": "Defines an error type that represents a Rigel file not being properly formatted. It inherits from the `RigelError` base class and overrides its `base` attribute to specify a custom error message with a `{trace}` placeholder for debugging purposes.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used to define a template for error messages related to unformatted Rigelfile errors. The template includes a placeholder `{trace}` that can be replaced with actual error trace information."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "8. It likely represents a unique error code that can be used to identify this specific type of Rigel file formatting error."
+              }
+            ],
+            "name": "UnformattedRigelfileError",
+            "location": {
+              "start": 21,
+              "insert": 22,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 21,
+                "end": 27
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "5c449400-53f4-7085-a648-802d9f470287",
+            "ancestors": [],
+            "description": "Defines a custom error type for Rigel, specifying that an incomplete Rigelfile is missing a required block. It inherits from `RigelError`, providing a base message and code (9) to be used when this error occurs.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used to define a formatted error message. It takes one placeholder variable '{block}' which will be replaced with the actual value when the error is raised."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "9, indicating a specific error code for this exception. This allows clients to handle and differentiate between different types of errors when exceptions are raised."
+              }
+            ],
+            "name": "IncompleteRigelfileError",
+            "location": {
+              "start": 32,
+              "insert": 33,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 32,
+                "end": 38
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "46959cfa-48ce-7c8e-e346-d398add77267",
+            "ancestors": [],
+            "description": "Inherits from `RigelError`. It represents an error where a provided Rigel file is empty. The base message for this error is \"Provided Rigelfile is empty.\" and the error code is 12. This class can be used to handle situations where an empty file is not expected or valid.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Set to the string \"Provided Rigelfile is empty.\". It seems to be a template message for error messages related to empty Rigel files."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "12. This integer value represents a specific error code used to identify this particular error."
+              }
+            ],
+            "name": "EmptyRigelfileError",
+            "location": {
+              "start": 43,
+              "insert": 44,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 43,
+                "end": 46
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 3
+          },
+          {
+            "id": "360d1bdb-8956-428f-3c4c-d40fa161253f",
+            "ancestors": [],
+            "description": "Defines an error type for RigelError. It represents an exception that occurs when an unsupported compiler is encountered, with a message formatted according to the `base` attribute and a specific code value of 13.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Set to a string that represents the message format for the error. It will be used as a template to construct the actual error message when the class is instantiated."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "13, indicating the specific error code for this exception."
+              }
+            ],
+            "name": "UnsupportedCompilerError",
+            "location": {
+              "start": 51,
+              "insert": 52,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 51,
+                "end": 57
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "388c8866-9a9d-b4a0-814b-3d913e7e70fe",
+            "ancestors": [],
+            "description": "Defines an error type for when a program encounters a platform that is not supported. It inherits from the `RigelError` class and takes a `{platform}` string as a parameter to create an error message with a specific code number, in this case, 14.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used to define a format string for error messages. It specifies the base template for constructing an error message, which includes the platform name."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "14, which represents a specific error code for this exception."
+              }
+            ],
+            "name": "UnsupportedPlatformError",
+            "location": {
+              "start": 62,
+              "insert": 63,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 62,
+                "end": 68
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "fa2d3d39-204b-dab6-8e49-f4dcea08cdb3",
+            "ancestors": [],
+            "description": "Defines an exception that is raised when an invalid platform is used. It inherits from the `RigelError` class and has a formatted base string and a code attribute. The base string includes the invalid platform name, which is passed as a parameter.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Assigned a default error message when an invalid platform is detected. The error message includes the '{platform}' placeholder for dynamic substitution."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "15, which is a unique identifier for this specific error. It can be used to handle exceptions in a more organized way."
+              }
+            ],
+            "name": "InvalidPlatformError",
+            "location": {
+              "start": 73,
+              "insert": 74,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 73,
+                "end": 79
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "b9c184c5-454d-6e98-124b-8137dfb01866",
+            "ancestors": [],
+            "description": "Defines an exception that is raised when a plugin cannot be loaded due to its absence from the system or incorrect installation. It provides a message with error details and a corresponding error code (17).",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Defined as a template for error messages. It contains a formatted string that will be used to generate error messages when a plugin cannot be loaded, including the name of the plugin."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "17, which represents a specific error code for this exception. It is used to identify the type of error that has occurred."
+              }
+            ],
+            "name": "PluginNotFoundError",
+            "location": {
+              "start": 84,
+              "insert": 85,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 84,
+                "end": 90
+              }
+            },
+            "item_type": "class",
+            "length": 4,
+            "docLength": 6
+          },
+          {
+            "id": "7a388b07-5ce5-7589-384f-a22aea0c3ab8",
+            "ancestors": [],
+            "description": "Defines a custom exception for handling errors during the installation of external plugins in Rigel applications. It inherits from the `RigelError` class and provides a base message with a placeholder `{plugin}` that can be replaced with the specific plugin name at runtime.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Part of its definition, representing a base or generic error message that can be used when reporting an error during installation of external plugins."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "18, indicating a specific error code for the exception raised by the plugin installation process."
+              }
+            ],
+            "name": "PluginInstallationError",
+            "location": {
+              "start": 96,
+              "insert": 97,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 96,
+                "end": 102
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "76a73b53-b108-32a8-0f42-c85fbbd538dc",
+            "ancestors": [],
+            "description": "Specifies an error that occurs when a plugin fails to comply with the Rigel plugin protocol. It takes two parameters: the name of the non-compliant plugin and the cause of the failure, then formats them into an error message.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used to define a base message format for error messages, which includes placeholders for `{plugin}` and `{cause}` to be replaced with actual values."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "19. It likely represents a specific error code for this exception, which can be used to differentiate it from other exceptions or errors."
+              }
+            ],
+            "name": "PluginNotCompliantError",
+            "location": {
+              "start": 107,
+              "insert": 108,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 107,
+                "end": 116
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 9
+          },
+          {
+            "id": "8be7422b-05b7-14b0-2344-32a9e609dbc7",
+            "ancestors": [],
+            "description": "Inherits from `RigelError`. It represents an exception that occurs when a plugin name is invalid, and provides a descriptive message with the invalid name inserted as a placeholder. The error code is set to 20.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used as a template for the error message when an instance of this class is raised. It contains a placeholder '{plugin}' that will be replaced with the actual invalid plugin name."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "20, which likely represents a specific error code or status code for this custom exception."
+              }
+            ],
+            "name": "InvalidPluginNameError",
+            "location": {
+              "start": 121,
+              "insert": 122,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 121,
+                "end": 127
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          },
+          {
+            "id": "fe301636-b9f5-b3b6-be42-df28168750c2",
+            "ancestors": [],
+            "description": "Defines an error type for Rigel software, which is triggered when certain ROS packages are not declared in a Rigelfile. The error message includes the list of missing packages and returns a code value of 21.",
+            "attributes": [
+              {
+                "name": "base",
+                "type_name": "str",
+                "description": "Used to define a message template for this error type. It contains a formatted string with placeholders for variable data, specifically a list of packages that were not declared in the Rigelfile."
+              },
+              {
+                "name": "code",
+                "type_name": "int",
+                "description": "21, indicating a specific error status or return value for the exception raised by this error class."
+              }
+            ],
+            "name": "UnknownROSPackagesError",
+            "location": {
+              "start": 132,
+              "insert": 133,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 132,
+                "end": 138
+              }
+            },
+            "item_type": "class",
+            "length": 3,
+            "docLength": 6
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "__init__.py",
+    "path": "tests/__init__.py",
+    "content": {
+      "structured": {
+        "description": "A class named `Node` using the `dataclasses` package, which represents a node in a graph with an integer label and a list of child nodes. The class is then used to create a directed acyclic graph (DAG) and perform depth-first search (DFS) traversal on it using a recursive function.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_exceptions.py",
+    "path": "tests/test_exceptions.py",
+    "content": {
+      "structured": {
+        "description": "A test suite using unittest package to validate exceptions raised by Rigel's exception classes. The tests cover various scenarios including file not found, file already exists, unformatted file, and others. The exceptions are used to handle specific error conditions during plugin installation, rigel file processing, and other operations.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_creator.py",
+    "path": "tests/test_files_creator.py",
+    "content": {
+      "structured": {
+        "description": "A unit test suite for RigelfileCreator class using unittest and mock libraries. The test suite has one test case which verifies the creation of a new Rigelfile by mocking resource_filename and copyfile functions from shutil library. The creator creates a file at a specific path and copies it to another location.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_decoder.py",
+    "path": "tests/test_files_decoder.py",
+    "content": {
+      "structured": {
+        "description": "A test suite using unittest package for testing the functionality of YAMLDataDecoder class from rigel.files module. The test suite consists of four tests that validate the decoding mechanism of YAMLDataDecoder with different data structures such as dictionaries and lists. The tests check if the decoder correctly handles references to unknown global variables and returns expected output.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_loader.py",
+    "path": "tests/test_files_loader.py",
+    "content": {
+      "structured": {
+        "description": "A test suite for the YAMLDataLoader class in the rigel.files module. The tests check if various exceptions are thrown when trying to load YAML files with specific conditions: a file not found, an empty file and an unformatted file. These exceptions are handled using unittest's assertRaises method and mock_open to simulate file open operations.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_renderer.py",
+    "path": "tests/test_files_renderer.py",
+    "content": {
+      "structured": {
+        "description": "A unit test suite for a class Renderer in rigel.files package, which is responsible for rendering template files using DockerSection configuration data. The test uses mocking and patching to verify that the renderer correctly renders a template file with specified input and output files, configuration data, and writes the rendered content to an output file.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_models_docker.py",
+    "path": "tests/test_models_docker.py",
+    "content": {
+      "structured": {
+        "description": "Unit tests for two classes from the Rigel project: `SSHKey` and `DockerSection`. The tests verify that the classes throw expected exceptions when invalid inputs are provided.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_models_plugin.py",
+    "path": "tests/test_models_plugin.py",
+    "content": {
+      "structured": {
+        "description": "A unit test class named PluginSectionTesting that tests the validity of a plugin name in the Rigel models. The test case checks if an InvalidPluginNameError is raised when an invalid plugin name is provided while creating an instance of PluginSection.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_plugins_installer.py",
+    "path": "tests/test_plugins_installer.py",
+    "content": {
+      "structured": {
+        "description": "Unit tests for the PluginInstaller class in the rigel.plugins module. The tests cover various scenarios including invalid plugin names, extracting valid plugin names' parts, using SSH and HTTPS protocols, installing plugins via pip with correct arguments, and handling installation errors. The tests utilize mocking and patching to simulate various conditions and verify expected behavior of the installer.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_plugins_loader.py",
+    "path": "tests/test_plugins_loader.py",
+    "content": {
+      "structured": {
+        "description": "Unit tests for the `PluginLoader` class in the Rigel project using the `unittest` framework and `pydantic` library. The tests cover various scenarios such as checking plugin compliance with expected methods, handling unknown plugins, and simulating plugin creation. The `PluginLoader` class is responsible for loading and initializing plugins based on their configuration.",
+        "items": []
+      }
+    }
+  }
+]

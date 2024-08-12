@@ -5,7 +5,15 @@ from rigel.models import DockerSection
 
 class Renderer:
     """
-    A class that creates Dockerfiles.
+    Renders a template file based on a given configuration and saves it to an
+    output file. It uses the Jinja2 templating engine to replace placeholders with
+    actual values from the configuration dictionary.
+
+    Attributes:
+        configuration_file (DockerSection): Initialized during object creation
+            with a specified configuration file. It represents a configuration
+            file for rendering templates.
+
     """
 
     def __init__(self, configuration_file: DockerSection) -> None:
@@ -17,13 +25,15 @@ class Renderer:
 
     def render(self, template: str, output: str) -> None:
         """
-        Create a new Dockerfile.
-        Dockerfiles are always placed inside the .rigel_config directory.
+        Generates a Dockerfile from a template and writes it to an output file
+        based on a configuration file, replacing placeholders with actual values.
 
-        :type template: string
-        :param template: Name of the template file to render.
-        :type output: string
-        :param output: Name for the output rendered file.
+        Args:
+            template (str): Expected to be a string representing the name of a
+                template file located in the 'assets/templates/' directory.
+            output (str): Used to specify the path or name of the file where the
+                rendered template will be written.
+
         """
         # Open file template.
         dockerfile_template = resource_string(__name__, f'assets/templates/{template}').decode('utf-8')

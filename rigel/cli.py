@@ -31,9 +31,12 @@ MESSAGE_LOGGER = MessageLogger()
 
 def handle_rigel_error(err: RigelError) -> None:
     """
-    Handler function for errors of type RigelError .
-    :type err: RigelError
-    :param err: The error to be handled
+    Logs an instance of `RigelError` using an `ErrorLogger` object and then
+    terminates the program with a specific exit code corresponding to the error.
+
+    Args:
+        err (RigelError): Required for the function to run successfully.
+
     """
     error_logger = ErrorLogger()
     error_logger.log(err)
@@ -53,10 +56,14 @@ def create_folder(path: str) -> None:
 # TODO: change return type to Rigelfile
 def parse_rigelfile() -> Any:
     """
-    Parse information inside local Rigelfile.
+    Loads a YAML file named 'Rigelfile' using `YAMLDataLoader`, decodes its content
+    with `YAMLDataDecoder`, and then uses it to build an object with `ModelBuilder`.
+    The result is returned as the output of this function.
 
-    :rtype: rigle.models.Rigelfile
-    :return: The parsed information.
+    Returns:
+        Any: An instance of a class representing a model, built using data loaded
+        from a YAML file and decoded by a YAML decoder.
+
     """
     loader = YAMLDataLoader('./Rigelfile')
     decoder = YAMLDataDecoder()
@@ -83,17 +90,25 @@ def load_plugin(
         application_kwargs: Dict[str, Any]
         ) -> Tuple[str, Plugin]:
     """
-    Load an external plugin.
+    Loads an external plugin into a Rigel application, overriding its command-line
+    arguments and keyword arguments with those provided by the application if
+    specified. It logs a warning message and handles errors during the loading process.
 
-    :type plugin: rigel.models.PluginSection
-    :param plugin: Metadata about the external plugin.
-    :type application_args: List[Any]
-    :param application_args: Additional positional arguments to be passed the plugin.
-    :type application_kwargs: Dict[str, Any]
-    :param application_kwargs: Additional keyword arguments to be passed the plugin.
+    Args:
+        plugin (PluginSection): Expected to be an instance of a class representing
+            a plugin.
+        application_args (List[Any]): Used to pass command-line arguments to an
+            external plugin. It allows the plugin to be initialized with additional
+            values from the application's command line interface.
+        application_kwargs (Dict[str, Any]): Used to specify keyword arguments for
+            the plugin instance being loaded. These arguments are updated in the
+            plugin's kwargs attribute.
 
-    :rtype: Tuple[str, rigel.plugin.Plugin]
-    :return: An instance of the external plugin.
+    Returns:
+        Tuple[str, Plugin]: A tuple containing two elements: the first element is
+        a string representing the name of the loaded plugin and the second element
+        is an instance of the loaded plugin.
+
     """
     MESSAGE_LOGGER.warning(f"Loading external plugin '{plugin.name}'.")
     try:
@@ -116,16 +131,32 @@ def load_plugin(
 
 def run_plugin(plugin: Tuple[str, Plugin]) -> None:
     """
-    Run an external plugin.
+    Executes an external plugin, runs it until its termination, and handles any
+    interruptions or termination requests. It logs messages at different stages
+    of plugin execution and termination, and catches any RigelError exceptions for
+    further processing.
 
-    :type plugin: Tuple[str, rigel.plugin.Plugin]
-    :param plugin: An external plugin to be run.
+    Args:
+        plugin (Tuple[str, Plugin]): Expected to contain exactly two elements: a
+            string representing the name of the plugin, and an instance of the
+            Plugin class.
+
     """
     try:
 
         plugin_name, plugin_instance = plugin
 
         def stop_plugin(*args: Any) -> None:
+            """
+            Terminates a plugin instance and logs a message indicating graceful
+            shutdown. It then exits the program with exit code 0, indicating
+            successful termination. The function accepts any number of arguments,
+            but does not use them.
+
+            Args:
+                *args (Any): List of positional arguments
+
+            """
             plugin_instance.stop()
             MESSAGE_LOGGER.info(f"Plugin '{plugin_name}' stopped executing gracefully.")
             sys.exit(0)
@@ -148,20 +179,32 @@ def run_simulation_plugin(
     manager: SimulationRequirementsManager,
 ) -> None:
     """
-    Run an external simulation plugin.
+    Runs a plugin in an external process, managing its execution and shutdown. It
+    catches any exceptions raised by the plugin, logs relevant messages, and stops
+    the plugin gracefully when interrupted or finished executing.
 
-    :type plugin: Tuple[str, rigel.plugin.Plugin]
-    :param plugin: An external plugin to be run.
-    :type manager: rigelcore.simulations.SimulationRequirementsManager
-    :param manager: The simulation requirements associated with the external plugin.
-    :type manager: rigelcore.simulations.SimulationRequirementsManager
-    :param manager: The simulation requirements associated with the external plugin.
+    Args:
+        plugin (Tuple[str, Plugin]): Unpacked into two variables: `plugin_name`
+            and `plugin_instance`. It represents an external plugin with its name
+            and instance.
+        manager (SimulationRequirementsManager): Used to monitor the state of the
+            simulation, specifically whether it has finished or not.
+
     """
     try:
 
         plugin_name, plugin_instance = plugin
 
         def stop_plugin(*args: Any) -> None:
+            """
+            Terminates a plugin instance and logs a message to indicate graceful
+            termination. It takes any number of arguments, stops the plugin using
+            its `stop` method, and then exits the program with exit code 0.
+
+            Args:
+                *args (Any): List of positional arguments
+
+            """
             plugin_instance.stop()
             MESSAGE_LOGGER.info(f"Plugin '{plugin_name}' stopped executing gracefully.")
             sys.exit(0)
@@ -188,7 +231,10 @@ def run_simulation_plugin(
 @click.group()
 def cli() -> None:
     """
-    Rigel - containerize and deploy your ROS application using Docker
+    Defines a command-line interface using the Click library. It is a group decorator
+    that wraps multiple commands and sub-commands together, allowing users to
+    access them from the terminal with a single prefix.
+
     """
     pass
 
@@ -197,7 +243,15 @@ def cli() -> None:
 @click.option('--force', is_flag=True, default=False, help='Write over an existing Rigelfile.')
 def init(force: bool) -> None:
     """
-    Create an empty Rigelfile.
+    Initializes a Rigelfile by creating it if it does not exist or overwriting it
+    if it already exists and the `--force` option is specified. It logs success
+    messages and handles any errors that occur during the process.
+
+    Args:
+        force (bool): A flag that controls whether to overwrite an existing Rigelfile
+            or not. When set to True, it allows writing over an existing file;
+            when False (default), it raises an error if the file already exists.
+
     """
     try:
 
@@ -214,10 +268,16 @@ def init(force: bool) -> None:
 
 def create_package_files(package: DockerSection) -> None:
     """
-    Create all the files required to containerize a given ROS package.
+    Creates build files for a Docker package by rendering templates into actual
+    files using a Renderer object. It generates a Dockerfile, an entrypoint script,
+    and optionally a configuration file based on input parameters from the `package`
+    object.
 
-    :type package: rigel.models.DockerSection
-    :param package: The ROS package whose Dockerfile is to be created.
+    Args:
+        package (DockerSection): Expected to contain information about the package
+            being processed, including its name (`package`) and optional directory
+            path (`dir`).
+
     """
     MESSAGE_LOGGER.warning(f"Creating build files for package {package.package}.")
 
@@ -245,7 +305,14 @@ def create_package_files(package: DockerSection) -> None:
 @click.option('--pkg', multiple=True, help='A list of desired packages.')
 def create(pkg: Tuple[str]) -> None:
     """
-    Create all files required to containerize your ROS packages.
+    Generates a list of desired packages from command-line options and filters
+    them based on a configuration file. It creates package files for selected
+    packages and handles errors if any packages are not found or invalid.
+
+    Args:
+        pkg (Tuple[str]): Optional with multiple values, allowing the user to
+            specify a list of desired packages when calling the command.
+
     """
     list_packages = list(pkg)
     try:
@@ -271,10 +338,15 @@ def create(pkg: Tuple[str]) -> None:
 
 def login_registry(package: Union[DockerSection, DockerfileSection]) -> None:
     """
-    Login to a Docker image registry.
+    Authenticates a Docker registry for a given package by logging into the registry
+    server with provided credentials, and logs any authentication errors.
 
-    :param package: The ROS package to be containerized and deployed.
-    :type package: DockerSection
+    Args:
+        package (Union[DockerSection, DockerfileSection]): Expected to be either
+            an instance of DockerSection or DockerfileSection class. This indicates
+            that it accepts different types of objects related to Docker package
+            registries.
+
     """
     docker = DockerClient()
 
@@ -299,6 +371,20 @@ def login_registry(package: Union[DockerSection, DockerfileSection]) -> None:
 
 
 def generate_paths(package: DockerSection) -> Tuple[str, str]:
+    """
+    Generates two absolute paths for a given `DockerSection` package. If the package
+    has a directory, it returns the directory and its `.rigel_config` subdirectory.
+    Otherwise, it returns the package name with `.rigel_config/` prefix in both cases.
+
+    Args:
+        package (DockerSection): Referred to as package throughout the code.
+
+    Returns:
+        Tuple[str, str]: A pair of absolute paths. The first path is to a directory
+        and its corresponding '.rigel_config' file if 'package.dir' exists.
+        Otherwise, the path is to '.rigel_config/{package.package}' and its own self.
+
+    """
     if package.dir:
         return (
             os.path.abspath(f'{package.dir}'),                      # package root
@@ -313,14 +399,20 @@ def generate_paths(package: DockerSection) -> Tuple[str, str]:
 
 def containerize_package(package: DockerSection, load: bool, push: bool) -> None:
     """
-    Containerize a given ROS package.
+    Containerizes a package by building and optionally pushing a Docker image using
+    various configuration files, handles SSH keys, and creates QEMU configurations
+    for supported platforms.
 
-    :type package: rigel.models.DockerSection
-    :param package: The ROS package whose Dockerfile is to be created.
-    :type load: bool
-    :param package: Store built image locally.
-    :type push: bool
-    :param package: Store built image in a remote registry.
+    Args:
+        package (DockerSection): Required for containerizing a package. It contains
+            information such as SSH keys, .rosinstall file, platforms, and image
+            name.
+        load (bool): Used to specify whether to load the Docker image after it has
+            been built.
+        push (bool): Optional. It controls whether to push the built Docker image
+            to the registry after building it. If set to True, the image will be
+            pushed; otherwise, it won't.
+
     """
     MESSAGE_LOGGER.warning(f"Containerizing package {package.package}.")
     if package.ssh and not package.rosinstall:
@@ -389,14 +481,21 @@ def containerize_package(package: DockerSection, load: bool, push: bool) -> None
 
 def build_image(package: DockerfileSection, load: bool, push: bool) -> None:
     """
-    Containerize a given ROS package (existing Dockerfile).
+    Creates a Docker image using a provided Dockerfile and registry login information.
+    It builds an image from the specified path, optionally loads it into memory,
+    and pushes it to a registry if necessary, logging informational messages
+    throughout the process.
 
-    :type package: rigel.models.DockerfileSection
-    :param package: The Dockerfile to use to containerize.
-    :type load: bool
-    :param package: Store built image locally.
-    :type push: bool
-    :param package: Store built image in a remote registry.
+    Args:
+        package (DockerfileSection): Expected to hold information about a Docker
+            package, including its Dockerfile location (`dockerfile`) and image
+            name (`image`).
+        load (bool): Used to specify whether the Docker image should be loaded
+            into memory during the build process or not.
+        push (bool): Used to specify whether the Docker image should be pushed
+            after building or not. The default behavior depends on the value
+            assigned to this variable.
+
     """
     MESSAGE_LOGGER.warning(f"Creating Docker image using provided Dockerfile at {package.dockerfile}")
 
@@ -422,7 +521,21 @@ def build_image(package: DockerfileSection, load: bool, push: bool) -> None:
 @click.option("--push", is_flag=True, show_default=True, default=False, help="Store built image in a remote registry.")
 def build(pkg: Tuple[str], load: bool, push: bool) -> None:
     """
-    Build a Docker image of your ROS packages.
+    Constructs a list of desired packages based on command-line options and parses
+    a configuration file to determine which packages to install, then installs or
+    builds them accordingly, storing results locally or remotely as specified by
+    user input.
+
+    Args:
+        pkg (Tuple[str]): Specified with multiple=True, allowing users to pass a
+            list of desired packages as separate arguments.
+        load (bool): Flag-like. When set to True, it indicates that the built image
+            should be stored locally. It defaults to False and has a default value
+            of False when not specified.
+        push (bool): An option for the command. It indicates whether to store built
+            images in a remote registry when set to True, or not (default False)
+            otherwise.
+
     """
     list_packages = list(pkg)
     rigelfile = parse_rigelfile()
@@ -451,7 +564,10 @@ def build(pkg: Tuple[str], load: bool, push: bool) -> None:
 @click.command()
 def deploy() -> None:
     """
-    Push a Docker image to a remote image registry.
+    Deploys a containerized ROS package by parsing a Rigelfile, loading and running
+    plugins defined in it, if any. If no deployment plugin is found, it logs a
+    warning message.
+
     """
     MESSAGE_LOGGER.info('Deploying containerized ROS package.')
 
@@ -470,7 +586,10 @@ def deploy() -> None:
 @click.command()
 def run() -> None:
     """
-    Start your containerized ROS application.
+    Initializes a ROS application and runs a simulation based on the contents of
+    a rigelfile, which defines plugins to simulate. It parses the file, loads
+    plugins, and executes them with specified requirements and timeout.
+
     """
     MESSAGE_LOGGER.info('Starting containerized ROS application.')
 
@@ -502,7 +621,20 @@ def run() -> None:
 @click.option('--ssh', is_flag=True, default=False, help='Whether the plugin is public or private. Use flag when private.')
 def install(plugin: str, host: str, ssh: bool) -> None:
     """
-    Install external plugins.
+    Installs a plugin on a hosting platform specified by the user. It takes three
+    parameters: the name of the plugin, the URL of the hosting platform (default
+    is 'github.com'), and a boolean indicating whether the plugin is public or private.
+
+    Args:
+        plugin (str): Passed to the function by the user through command-line
+            input. It specifies the name or identifier of the plugin to be installed.
+        host (str): Optional. It defaults to 'github.com' and specifies the URL
+            of the hosting platform for the plugin. The user can override this
+            default by providing a different value at command invocation time.
+        ssh (bool): 0 by default, meaning it's set to False. When True, it indicates
+            that the plugin is private or not public. It can be enabled or disabled
+            using a flag option.
+
     """
     try:
         installer = PluginInstaller(plugin, host, ssh)

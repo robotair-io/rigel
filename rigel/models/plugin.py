@@ -5,24 +5,23 @@ from typing import Any, Dict, List
 
 class PluginSection(BaseModel):
     """
-    A placeholder for information regarding a single external plugin.
+    Defines a model for a plugin, which includes required and optional fields. The
+    required field is `name`, while `args`, `entrypoint`, and `kwargs` are optional.
+    It also contains a validator to ensure the format of the plugin name is in the
+    format `<AUTHOR>/<PACKAGE>`.
 
-    Each external plugin consists of an unique Python module that must be
-    installed in the system. Plugins are then loaded at runtime by Rigel.
+    Attributes:
+        name (str): Required to be filled. It must conform to the format <AUTHOR>/<PACKAGE>.
+        args (List[Any]): Initialized with a default value of an empty list. This
+            means it can be used to store any number of arguments that are passed
+            when using this plugin.
+        entrypoint (str): Initialized with a default value 'Plugin'. This means
+            that when an instance of `PluginSection` is created, the `entrypoint`
+            attribute will be set to 'Plugin' unless otherwise specified.
+        kwargs (Dict[str, Any]): Initialized to an empty dictionary. It allows for
+            arbitrary keyword arguments that can be passed when creating a plugin
+            section.
 
-    Each external plugin must contain an entrypoint class responsible for
-    plugin setup and execution. Each entrypoint class must be compliant with
-    protocol rigel.plugins.Plugin.
-
-    :type name: string
-    :cvar name: The name of the plugin module.
-    :type args: List[Any]
-    :cvar args: List of arguments to be passed to the entrypoint class.
-    :type entrypoint: string
-    :cvar entrypoint: The name of the class to be instantiated (default Plugin).
-    All entrypoint classes must be compliant with protocol rigel.plugins.Plugin .
-    :type kwargs: Dict[str, Any]
-    :cvar kwargs: Positional arguments to be passed to the entrypoint class.
     """
     # Required fields.
     name: str
@@ -35,9 +34,20 @@ class PluginSection(BaseModel):
     @validator('name')
     def validate_name(cls, name: str) -> str:
         """
-        Ensure that the plugin name follows the format <AUTHOR>/<PACKAGE>.
-        :type name: string
-        :param name: Name of the plugin.
+        Validates the input 'name' as follows: if the length of the name, after
+        stripping leading and trailing whitespace and splitting by '/', is not
+        equal to 2, it raises an InvalidPluginNameError; otherwise, it returns the
+        original name.
+
+        Args:
+            name (str): Validated by this method. The validation checks if the
+                name contains exactly one slash (`/`) and returns the original
+                name if valid, or raises an exception otherwise.
+
+        Returns:
+            str: The validated input name. If the validation fails, it raises an
+            exception and doesn't return any result.
+
         """
         if not len(name.strip().split('/')) == 2:
             raise InvalidPluginNameError(plugin=name)
