@@ -23,7 +23,15 @@ from .requirements import (
 
 class SimulationRequirementsVisitor(HplAstVisitor):
     """
-    A class to extract simulation requirements from the nodes of a transformed HPL AST.
+    Traverses an abstract syntax tree (AST) and extracts simulation requirements
+    from it, creating a hierarchical structure of `SimulationRequirementNode`
+    objects based on various types of events and patterns in the AST.
+
+    Attributes:
+        requirement (Optional[SimulationRequirementNode]): Initialized to None.
+            It is updated during the visit_hpl_pattern method based on the node's
+            pattern type.
+
     """
 
     requirement: Optional[SimulationRequirementNode]
@@ -37,12 +45,10 @@ class SimulationRequirementsVisitor(HplAstVisitor):
 
     def __initialize_disjunction_requirement_event(self, event: HplEventDisjunction) -> SimulationRequirementNode:
         """
-        Creates an instance of DisjointSimulationRequirementNode by iterating over an instance of HplEventDisjunction.
+        Parses an HplEventDisjunction object, extracting and linking its constituent
+        simulation requirement nodes into a DisjointSimulationRequirementNode
+        structure, representing a disjunction requirement event.
 
-        :type event: HplEventDisjunction
-        :param event: Placeholder of all information regarding a disjoint simulation requirement node.
-        :rtype: SimulationRequirementNode
-        :return: A simulation requirement node.
         """
         disjoint_node = DisjointSimulationRequirementNode()
 
@@ -60,12 +66,10 @@ class SimulationRequirementsVisitor(HplAstVisitor):
 
     def __initialize_simple_requirement_node(self, event: HplSimpleEvent) -> SimulationRequirementNode:
         """
-        Creates an instance of SimulationRequirementNode by iterating over an instance of HlpSimpleEvent.
+        Initializes a SimpleSimulationRequirementNode with properties from an event
+        and a callback function generated based on the predicate type (vacuous
+        truth or binary operator).
 
-        :type event: HplSimpleEvent
-        :param event: Placeholder for all information regarding a disjoint simulation requirement node.
-        :rtype: SimulationRequirementNode
-        :return: A simulation requirement node.
         """
         generator = CallbackGenerator()
         if isinstance(event.predicate, HplVacuousTruth):
@@ -83,12 +87,11 @@ class SimulationRequirementsVisitor(HplAstVisitor):
 
     def __extract_simulation_requirement_node(self, event: HplEvent) -> SimulationRequirementNode:
         """
-        Creates an instance of SimulationRequirementNode by iterating over an instance of HplEvent.
+        Extracts a simulation requirement node from an input event, returning it
+        as a SimulationRequirementNode object. It handles three types of events:
+        HplSimpleEvent, HplEventDisjunction, and raises an exception for unknown
+        event subclasses.
 
-        :type event: HplEvent
-        :param event: Placeholder for all information regarding a simulation requirement node.
-        :rtype: SimulationRequirementNode
-        :return: A simulation requirement node.
         """
         if isinstance(event, HplSimpleEvent):
             return self.__initialize_simple_requirement_node(event)
@@ -100,10 +103,13 @@ class SimulationRequirementsVisitor(HplAstVisitor):
 
     def visit_hpl_pattern(self, node: HplPattern) -> None:
         """
-        Extract information from a node of type HplPattern.
+        Visits an HPLPattern node and creates a corresponding simulation requirement
+        node based on the pattern type, setting its timeout value. It also extracts
+        child nodes and adds them to the created requirement node's children list.
 
-        :param node: The HPL AST node.
-        :type node: HplPattern
+        Args:
+            node (HplPattern): Expected to be an instance of this class.
+
         """
         if node.is_existence:
             self.requirement = ExistenceSimulationRequirementNode(timeout=node.max_time)
@@ -126,8 +132,13 @@ class SimulationRequirementsVisitor(HplAstVisitor):
 
 class SimulationRequirementsParser:
     """
-    A class to parse simulation requirements.
-    All simulation requirements must be declared in the HPL language.
+    Parses a string input representing simulation requirements and returns a
+    structured representation of the requirements as an instance of `SimulationRequirementNode`.
+
+    Attributes:
+        __parser (property_parser): Used to parse HPL requirement strings into
+            abstract syntax trees (ASTs).
+
     """
 
     def __init__(self) -> None:
@@ -138,13 +149,20 @@ class SimulationRequirementsParser:
 
     def parse(self, hpl_requirement: str) -> SimulationRequirementNode:
         """
-        Parse a single simulation requirement.
-        All simulation requirements must be expressed in the HPL language.
+        Parses an HPL requirement string using a parser, traverses the resulting
+        Abstract Syntax Tree (AST), and applies a visitor to each node to extract
+        the simulation requirement into a SimulationRequirementNode object.
 
-        :param hpl_requirement: A simulation requirement expressed in the HPL language.
-        :type hpl_requirement: str
-        :return: A tree of simulation requirements.
-        :rtype: SimulationRequirementsManager
+        Args:
+            hpl_requirement (str): Expected to contain an HPL (High Performance
+                Linpack) requirement. The exact format and structure of this string
+                are not specified.
+
+        Returns:
+            SimulationRequirementNode: Initialized by a SimulationRequirementsVisitor
+            after parsing an HPL requirement string and traversing its abstract
+            syntax tree (AST).
+
         """
         visitor = SimulationRequirementsVisitor()
 

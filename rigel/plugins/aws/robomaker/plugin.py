@@ -16,6 +16,22 @@ LOGGER = get_logger()
 
 class Plugin(PluginBase):
 
+    """
+    Handles RoboMaker simulation job creation, management and interaction. It sets
+    up a robot and simulation application if necessary, creates a simulation job,
+    waits for its status to reach 'Running', and then stops it after the specified
+    duration.
+
+    Attributes:
+        model (PluginModel): Created through ModelBuilder by calling `build([],
+            self.raw_data)`. It represents a plugin model that contains details
+            about robot applications, simulation applications, IAM roles, output
+            locations, vpc configurations, and other related settings.
+        raw_data (PluginRawData): Passed to the plugin during initialization. Its
+            contents are not explicitly defined but are expected to contain the
+            raw data required for the plugin's operation.
+
+    """
     def __init__(
         self,
         raw_data: PluginRawData,
@@ -24,6 +40,27 @@ class Plugin(PluginBase):
         providers_data: Dict[str, Any],
         shared_data: Dict[str, Any] = {}  # noqa
     ) -> None:
+        """
+        Initializes an instance of the plugin by calling its superclass's constructor
+        and then building a model for the plugin based on raw data. It asserts
+        that the built model is an instance of the PluginModel class.
+
+        Args:
+            raw_data (PluginRawData): Passed to the superclass's initializer as
+                well as used when building the model instance via ModelBuilder.
+            global_data (RigelfileGlobalData): Passed to the class constructor.
+                Its presence indicates that it is an input required for the
+                initialization process.
+            application (Application): Passed to the parent class's constructor
+                along with other parameters.
+            providers_data (Dict[str, Any]): Optional (with default value `{}`).
+                It appears to hold data related to providers, possibly being used
+                in the construction of the PluginModel.
+            shared_data (Dict[str, Any]): Optional by default. It provides additional
+                data that can be shared among different parts of the system. If
+                not provided, it defaults to an empty dictionary.
+
+        """
         super().__init__(
             raw_data,
             global_data,
@@ -38,6 +75,16 @@ class Plugin(PluginBase):
 
     def retrieve_robomaker_client(self) -> boto3.session.Session.client:
 
+        """
+        Retrieves and returns an AWS RoboMaker client based on a list of available
+        AWS providers, ensuring only one provider is used and it is properly
+        configured for RoboMaker operations.
+
+        Returns:
+            boto3.session.Session.client: A client object that can be used for
+            interacting with Amazon RoboMaker service through Boto3, an SDK for AWS.
+
+        """
         providers = [provider for _, provider in self.providers_data.items() if isinstance(provider, AWSProviderOutputModel)]
 
         if not providers:
@@ -51,6 +98,16 @@ class Plugin(PluginBase):
             return client
 
     def create_robot_application(self) -> Dict[str, Any]:
+        """
+        Creates a new robot application using information from the model and logs
+        the creation process. The method takes no arguments besides the self
+        parameter, indicating it is part of a class.
+
+        Returns:
+            Dict[str, Any]: A new robot application object after it has been
+            successfully created using the provided parameters.
+
+        """
         kwargs = {
             'name': self.model.robot_application.name,
             'robotSoftwareSuite': {
@@ -68,11 +125,33 @@ class Plugin(PluginBase):
         self,
         arn: str
     ) -> None:
+        """
+        Deletes a robot application specified by its Amazon Resource Name (ARN)
+        using the RoboMaker client. The deletion is confirmed with an informational
+        log message if successful.
+
+        Args:
+            arn (str): Required. It represents the Amazon Resource Name (ARN) for
+                the robot application to be deleted.
+
+        """
         kwargs = {'application': arn}
         self.__robomaker_client.delete_robot_application(**kwargs)
         LOGGER.info("Robot application deleted with success")
 
     def create_simulation_application(self) -> Dict[str, Any]:
+        """
+        Creates a new simulation application using the RoboMaker client, with
+        parameters such as name, robot software suite, simulation software suite,
+        and environment URI. It then logs an information message upon successful
+        creation.
+
+        Returns:
+            Dict[str, Any]: An instance of a simulation application created by the
+            AWS RoboMaker client using the provided parameters. The returned object
+            is logged as a successful creation and then passed back to the caller.
+
+        """
         kwargs = {
             'name': self.model.simulation_application.name,
             'robotSoftwareSuite': {
@@ -93,11 +172,36 @@ class Plugin(PluginBase):
         self,
         arn: str
     ) -> None:
+        """
+        Deletes a simulation application identified by its Amazon Resource Name
+        (ARN). It uses the Robomaker client to send a DELETE request and logs a
+        success message when the operation is complete.
+
+        Args:
+            arn (str): Required, representing an Amazon Resource Name (ARN) that
+                uniquely identifies the simulation application to be deleted.
+
+        """
         kwargs = {'application': arn}
         self.__robomaker_client.delete_simulation_application(**kwargs)
         LOGGER.info("Simulation application deleted with success")
 
     def convert_envs(self, envs: List[str]) -> Dict[str, str]:
+        """
+        Takes a list of environment variable strings and returns a dictionary where
+        each key-value pair is extracted from the input string using the '='
+        character as separator, with leading/trailing whitespaces removed.
+
+        Args:
+            envs (List[str]): Expected to contain strings representing environment
+                variables, where each string is in the format 'key=value'.
+
+        Returns:
+            Dict[str, str]: A dictionary mapping environment variable names to
+            their corresponding values. The input list of strings representing
+            environment variables in 'key=value' format is converted into this dictionary.
+
+        """
         result = {}
         for env in envs:
             key, value = env.split('=')
@@ -105,6 +209,18 @@ class Plugin(PluginBase):
         return result
 
     def create_simulation_job(self) -> Dict[str, Any]:
+        """
+        Creates a RoboMaker simulation job based on the provided configuration
+        data from the model and other dependent objects, and returns the created
+        job. It also logs the creation event if successful.
+
+        Returns:
+            Dict[str, Any]: A dictionary representing the created simulation job.
+            This includes information such as IAM role, output location, maximum
+            job duration, VPC configuration, robot and simulation applications,
+            compute configuration, data sources, and worldforge exported jobs.
+
+        """
         kwargs = {
             'iamRole': self.model.iam_role,
             'outputLocation': {'s3Bucket': self.model.output_location} if self.model.output_location else {},
@@ -196,11 +312,32 @@ class Plugin(PluginBase):
         return simulation_job
 
     def cancel_simulation_job(self, arn: str) -> None:
+        """
+        Cancels a specified simulation job using AWS RoboMaker's cancel_simulation_job
+        API and logs the success to the LOGGER.
+
+        Args:
+            arn (str): Required to specify the Amazon Resource Name (ARN) of the
+                simulation job that should be cancelled.
+
+        """
         kwargs = {'job': arn}
         self.__robomaker_client.cancel_simulation_job(**kwargs)
         LOGGER.info('Simulation job canceled with success')
 
     def wait_simulation_job_status(self, status: str) -> None:
+        """
+        Waits for a simulation job to reach a specific status (e.g., 'SUCCEEDED',
+        'FAILED') by periodically querying the AWS RoboMaker client and updating
+        the local simulation job data until the desired status is reached.
+
+        Args:
+            status (str): Used to specify the expected status of the simulation
+                job. It determines when the waiting loop should terminate, as the
+                function checks if the simulation job's status matches this specified
+                value.
+
+        """
         kwargs = {'job': self.__simulation_job['arn']}
         LOGGER.info(f"Waiting for simulation job status to be '{status}'")
         while True:
@@ -211,6 +348,16 @@ class Plugin(PluginBase):
             time.sleep(0.5)
 
     def get_robot_application(self) -> Optional[Dict[str, Any]]:
+        """
+        Retrieves a robot application from Robomaker based on its name, returns
+        the found application if exists and logs an info message, otherwise returns
+        None.
+
+        Returns:
+            Optional[Dict[str, Any]]: Either a dictionary representing an existing
+            robot application summary or None if no such application is found.
+
+        """
         kwargs = {
             "maxResults": 1,
             "filters":
@@ -228,6 +375,17 @@ class Plugin(PluginBase):
         return None
 
     def get_simulation_application(self) -> Optional[Dict[str, Any]]:
+        """
+        Retrieves a simulation application from Robomaker using the provided client.
+        If the application exists, it returns the summary of the first result;
+        otherwise, it returns None.
+
+        Returns:
+            Optional[Dict[str, Any]]: Either a dictionary representing a simulation
+            application summary or None if no matching simulation application is
+            found.
+
+        """
         kwargs = {
             "maxResults": 1,
             "filters":
@@ -245,6 +403,12 @@ class Plugin(PluginBase):
         return None
 
     def setup(self) -> None:
+        """
+        Initializes and configures various components for RoboMaker simulations,
+        including retrieving clients, obtaining or creating robot and simulation
+        applications, and creating a simulation job based on provided model settings.
+
+        """
         self.__robomaker_client = self.retrieve_robomaker_client()
 
         self.__robot_application = None
@@ -260,6 +424,12 @@ class Plugin(PluginBase):
 
     def start(self) -> None:
 
+        """
+        Initializes simulation job status and retrieves simulation duration, public
+        IP address, and port. It then populates shared data with these values and
+        prints the accessible URL for the simulation job.
+
+        """
         self.wait_simulation_job_status('Running')
 
         simulation_job_duration = self.model.simulation_duration
@@ -277,6 +447,13 @@ class Plugin(PluginBase):
 
     def process(self) -> None:
 
+        """
+        Waits for a simulation job to finish, displaying informative messages
+        during that time. If no cancellation signal (CTRL-C/CTRL-Z) is received
+        within the specified duration, it pauses execution for the same duration
+        using `time.sleep`.
+
+        """
         if self.model.simulation_duration:
 
             LOGGER.info("Waiting for simulation job to finish.")
@@ -285,6 +462,12 @@ class Plugin(PluginBase):
             time.sleep(self.model.simulation_duration)
 
     def stop(self) -> None:
+        """
+        Cancels a simulation job, deletes a robot application, and deletes a
+        simulation application if they exist, indicating a shutdown or termination
+        process for these entities.
+
+        """
         self.cancel_simulation_job(self.__simulation_job['arn'])
 
         if self.__robot_application is not None:

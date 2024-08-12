@@ -10,18 +10,23 @@ RigelfileGlobalData = Dict[str, Union[ComplexDataModel, SimpleDataModel]]
 
 
 class Rigelfile(BaseModel, extra=Extra.forbid):
-    """A placeholder for information regarding jobs of a ROS application.
+    """
+    Defines a data model for Rigel configuration files. It has required fields for
+    application and jobs, as well as optional fields for providers, sequences, and
+    global variables. This class ensures that only necessary data is stored in the
+    Rigel configuration file.
 
-    :type application: Application
-    :cvar application: General information about the ROS application.
-    :type jobs: Dict[str, PluginDataModel]
-    :cvar jobs: The jobs supported by the package.
-    :type sequences: Dict[str, Sequence]
-    :cvar sequences: The supported sequence of jobs.
-    :type providers: Dict[str, ProviderDataModel]
-    :cvar providers: A list of required providers.
-    :type vars: Dict[str, Any]
-    :cvar vars: Section containing the values of global variables.
+    Attributes:
+        application (Application): Required.
+        jobs (Dict[str, PluginDataModel]): Required. It represents a dictionary
+            where each key is a string and the corresponding value is of type PluginDataModel.
+        providers (Dict[str, ProviderDataModel]): Optional by default with a default
+            value of an empty dictionary `{}`.
+        sequences (Dict[str, Sequence]): Optional. It contains a dictionary where
+            keys are strings and values are instances of the `Sequence` model.
+        vars (RigelfileGlobalData): Initialized with an empty dictionary `{}` by
+            default.
+
     """
 
     # Required fields.

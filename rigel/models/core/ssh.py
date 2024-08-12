@@ -3,12 +3,19 @@ from rigel.models.data import ComplexDataModel
 
 
 class SSHPrivateKeyFile(ComplexDataModel, extra=Extra.forbid):
-    """Information placeholder regarding a given private SSH key.
+    """
+    Defines a complex data model for representing SSH private key files. It has
+    two attributes: `hostname` and `path`, which specify the hostname associated
+    with the key file and its path, respectively. This class enforces strict schema
+    validation by forbidding extra attributes.
 
-    :type hostname: string
-    :cvar hostname: The URL of the host associated with the key.
-    :type path: string
-    :cvar path: The system path to the private SSH key.
+    Attributes:
+        hostname (str): Part of the class's definition, allowing it to be used
+            within the context of SSH private key files, likely representing a
+            hostname associated with the key.
+        path (str): Used to store a string value representing the file path where
+            the SSH private key is located.
+
     """
 
     hostname: str
@@ -17,12 +24,17 @@ class SSHPrivateKeyFile(ComplexDataModel, extra=Extra.forbid):
 
 class SSHPrivateKey(ComplexDataModel, extra=Extra.forbid):
 
-    """Information placeholder regarding a given private SSH key.
+    """
+    Represents an SSH private key data model, inheriting from `ComplexDataModel`.
+    It has two attributes: `hostname` and `value`, both of type `str`, which likely
+    represent the hostname and the private key value respectively.
 
-    :type hostname: string
-    :cvar hostname: The URL of the host associated with the key.
-    :type value: string
-    :cvar value: The private SSH key.
+    Attributes:
+        hostname (str): A part of the inherited `ComplexDataModel`.
+        value (str): Part of the class definition. It represents the private key
+            value itself, which is a string representation of the SSH private key
+            data.
+
     """
 
     hostname: str

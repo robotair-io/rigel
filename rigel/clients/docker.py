@@ -10,8 +10,24 @@ MESSAGE_LOGGER = get_logger()
 
 class DockerClient:
     """
-    A wrapper class for the docker.client.DockerClient.
-    Keeps the same functionality but allows for error handling that suits better Rigel.
+    Wraps the Python-on-whales library, providing a set of methods for interacting
+    with Docker containers, networks, and builders. It allows managing, creating,
+    inspecting, and removing these entities, as well as waiting for specific
+    container statuses.
+
+    Attributes:
+        DOCKER_CONTAINER_ID_DISPLAY_SIZE (int): 12 by default. It determines the
+            number of characters to display for a container ID when logging messages.
+        DOCKER_RUN_TIMEOUT (int): 120 seconds, which represents the maximum time
+            to wait for a Docker container's status to become a certain state when
+            running the `wait_for_container_status` method.
+        DOCKER_RUN_WAIT_STATUS (int): 3 seconds. It represents the time interval
+            to wait before checking the status of a container after a Docker run
+            operation, if the expected status has not been reached yet.
+        client (python_on_whales.docker_client.DockerClient): Initialized in the
+            constructor (`__init__`) with `python_on_whales.docker`. It provides
+            a wrapper around the Docker client.
+
     """
 
     DOCKER_CONTAINER_ID_DISPLAY_SIZE: int = 12
@@ -35,6 +51,23 @@ class DockerClient:
         # Wrapper for 'python_on_whales.docker_client.DockerClient'.
         # Look for arguments inside wrapped class before throwing an AttributeError.
 
+        """
+        Retrieves an attribute from either the DockerClient object or its client
+        attribute, and returns it if found. If not found in both places, it raises
+        an AttributeError with a custom message indicating that no 'DockerClient'
+        object has the specified attribute.
+
+        Args:
+            __name (str): An attribute name to be accessed. It is used as a key
+                to access attributes from either the object itself or its client,
+                if not found in the object.
+
+        Returns:
+            Any: Either an attribute from itself or from its client, depending on
+            whether it exists in one or both objects. If not found in both, it
+            raises an AttributeError with a custom message.
+
+        """
         try:
             return object.__getattribute__(self, __name)
         except AttributeError:
@@ -49,11 +82,21 @@ class DockerClient:
 
     def get_builder(self, name: str) -> Optional[python_on_whales.components.buildx.cli_wrapper.Builder]:
         """
-        Get a Docker builder
-        :param name: the name of the builder
-        :type name: str
-        :return: the builder, if existent
-        :rtype: python_on_whales.components.buildx.cli_wrapper.Builder
+        Attempts to retrieve a Buildx Builder instance by name from the client's
+        buildx inspect method, and returns it if successful; otherwise, it catches
+        any DockerException that may occur during the retrieval process and returns
+        None instead.
+
+        Args:
+            name (str): Expected to be a string that represents the name of a
+                builder, which can be inspected or retrieved from Docker.
+
+        Returns:
+            Optional[python_on_whales.components.buildx.cli_wrapper.Builder]:
+            Either an instance of class Builder or None. The value depends on
+            whether a DockerException occurs during the inspection of a builder
+            with the given name.
+
         """
         try:
             return self.client.buildx.inspect(name)
@@ -67,14 +110,24 @@ class DockerClient:
         driver: str = 'docker-container'
     ) -> python_on_whales.components.buildx.cli_wrapper.Builder:
         """
-        Create a Docker builder.
+        Creates a new buildx builder with the specified name, use flag, and driver
+        type. If the builder already exists, it returns the existing one; otherwise,
+        it creates a new one and returns it.
 
-        :param name: the builder name
-        :type name: str
-        :param use: set to use, defaults to True
-        :type use: bool, optional
-        :return: the created Docker builder, if unexistent.
-        :rtype: python_on_whales.components.buildx.cli_wrapper.Builder
+        Args:
+            name (str): Required. It represents the name of the builder to be
+                created or retrieved, which uniquely identifies a builder instance.
+            use (bool): True by default. Its purpose is not explicitly specified,
+                but based on its position among other parameters related to Docker
+                buildx, it likely controls whether a builder should be used or not.
+            driver (str): Set to 'docker-container' by default. It determines the
+                driver used for building images with Buildx, such as Docker container
+                or Kubernetes cluster.
+
+        Returns:
+            python_on_whales.components.buildx.cli_wrapper.Builder: Either an
+            existing builder or a newly created one if no matching name is found.
+
         """
         builder = self.get_builder(name)
         if not builder:
@@ -86,10 +139,14 @@ class DockerClient:
 
     def remove_builder(self, name: str) -> None:
         """
-        Remove a Docker builder.
+        Removes a builder with the given name from the buildx system using the
+        client's buildx remove command. If the removal fails, it raises a
+        DockerAPIError exception.
 
-        :type name: string
-        :param name: The name of the Docker builder.
+        Args:
+            name (str): Required to uniquely identify the builder that needs to
+                be removed from the Docker environment.
+
         """
         builder = self.get_builder(name)
         if builder:
@@ -100,13 +157,19 @@ class DockerClient:
 
     def get_network(self, name: str) -> Optional[python_on_whales.components.network.cli_wrapper.Network]:
         """
-        Get a Docker network.
+        Retrieves a network with a given name from the Docker client, returns it
+        if successful, or None if an exception occurs while inspecting the network.
 
-        :type name: string
-        :param name: The name of the Docker network.
+        Args:
+            name (str): Required to be specified when calling this function. It
+                represents the name of the network that needs to be retrieved or
+                inspected.
 
-        :rtype: Optional[python_on_whales.components.network.cli_wrapper.Network]
-        :return: The Docker network with the specified name.
+        Returns:
+            Optional[python_on_whales.components.network.cli_wrapper.Network]: A
+            network object if it exists, or None if an exception occurs during its
+            retrieval.
+
         """
         try:
             return self.client.network.inspect(name)
@@ -115,15 +178,21 @@ class DockerClient:
 
     def create_network(self, name: str, driver: str) -> python_on_whales.components.network.cli_wrapper.Network:
         """
-        Create a Docker network.
+        Creates or retrieves a Docker network with a specified name and driver,
+        and returns a CLI wrapper object for interacting with that network.
 
-        :type name: string
-        :param name: The name of the Docker network.
-        :type driver: string
-        :param driver: Name of driver used to create the network.
+        Args:
+            name (str): Required. It specifies the name of the network to create
+                or retrieve. If the network with this name already exists, it will
+                be retrieved; otherwise, a new network with this name will be created.
+            driver (str): Used to specify the driver for the network, such as
+                'bridge' or 'host', depending on the Docker networking mode desired.
 
-        :rtype: python_on_whales.components.network.cli_wrapper.Network
-        :return: The Docker network with the specified name.
+        Returns:
+            python_on_whales.components.network.cli_wrapper.Network: Either a
+            created network object or an already existing network object if it was
+            found by its name.
+
         """
         network = self.get_network(name)
         if not network:
@@ -135,10 +204,14 @@ class DockerClient:
 
     def remove_network(self, name: str) -> None:
         """
-        Remove a Docker network.
+        Removes a network with the given name from Docker. If the network does not
+        exist, it raises an exception; if there's a Docker-related error during
+        removal, it propagates the original exception.
 
-        :type name: string
-        :param name: The name of the Docker network.
+        Args:
+            name (str): Used to specify the name of a network that needs to be
+                removed from the system.
+
         """
         network = self.get_network(name)
         if network:
@@ -149,13 +222,21 @@ class DockerClient:
 
     def get_container(self, name: str) -> Optional[python_on_whales.components.container.cli_wrapper.Container]:
         """
-        Get a Docker container.
+        Retrieves information about a container with the given name. If the container
+        exists, it returns the inspected container object; otherwise, it returns
+        None. If an error occurs during the operation, it raises a DockerAPIError
+        exception.
 
-        :type name: string
-        :param name: The name of the Docker container.
+        Args:
+            name (str): Required for identifying a specific container. It is used
+                to check if the container exists with the given name and to inspect
+                the container if it does exist.
 
-        :rtype: Optional[python_on_whales.components.container.cli_wrapper.Container]
-        :return: The Docker container with the specified name.
+        Returns:
+            Optional[python_on_whales.components.container.cli_wrapper.Container]:
+            Either a Container object or None, depending on whether the container
+            with the given name exists in Docker or not.
+
         """
         try:
             if self.client.container.exists(name):
@@ -172,18 +253,25 @@ class DockerClient:
         **kwargs: Any
     ) -> Union[python_on_whales.components.container.cli_wrapper.Container, str, Iterable[Tuple[str, bytes]]]:
         """
-        Run a Docker container with a given name.
+        Runs a new Docker container from an image or returns an existing one with
+        the given name. If no container exists, it creates and starts a new one;
+        otherwise, it returns the existing one.
 
-        :type name: string
-        :param name: The Docker container name.
-        :type image: string
-        :param name: The Docker image.
-        :type kwargs: Dict[str, Any]
-        :param kwargs: Keyword arguments. Consult the documentation for more information
-        (https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/)
+        Args:
+            name (str): Required. It represents the name of the container to be
+                run or created. If the container with this name already exists,
+                it returns an existing container instance; otherwise, it creates
+                a new one.
+            image (str): Used to specify the name or ID of an image from which a
+                new container is created when running the container for the first
+                time.
+            **kwargs (Any): Dictionary of keyword arguments
 
-        :rtype: Union[python_on_whales.components.container.cli_wrapper.Container, str, Iterable[Tuple[str, bytes]]]
-        :return: The created Docker container
+        Returns:
+            Union[python_on_whales.components.container.cli_wrapper.Container,
+            str, Iterable[Tuple[str, bytes]]]: Either an instance of Container, a
+            string or an iterable of tuples containing strings and bytes.
+
         """
         container = self.get_container(name)
         if not container:
@@ -196,10 +284,14 @@ class DockerClient:
 
     def remove_container(self, name: str) -> None:
         """
-        Remove a Docker container.
+        Removes a container with the specified name from the system, forcing its
+        removal if necessary and deleting any attached volumes. If an error occurs
+        during removal, it raises a DockerAPIError exception.
 
-        :type name: string
-        :param name: The name of the Docker container.
+        Args:
+            name (str): Required to specify the name of a container that needs to
+                be removed from the system.
+
         """
         container = self.get_container(name)
         if container:
@@ -214,12 +306,16 @@ class DockerClient:
             status: str
             ) -> None:
         """
-        Wait for a container status to change to a desired value.
+        Waits for the status of a specified container to become a certain status,
+        within a defined timeout period. If the container does not exist, it raises
+        an exception.
 
-        :type name: string
-        :param name: The name of the container to watch.
-        :type status: string
-        :param status: The desires container status.
+        Args:
+            name (str): Required. It specifies the name of the container for which
+                to wait for its status to become a specified status.
+            status (str): Expected as a string representing the desired status of
+                the container.
+
         """
 
         elapsed_time = 0  # seconds

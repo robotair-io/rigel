@@ -1,0 +1,250 @@
+[
+  {
+    "name": "test_clients_rosbridge.py",
+    "path": "tests/clients/test_clients_rosbridge.py",
+    "content": {
+      "structured": {
+        "description": "A suite of unit tests for the ROSBridgeClient class using unittest framework. The client is responsible for connecting to a ROS bridge server and registering message handlers for various topics. The test cases cover scenarios such as client connection establishment, handler registration, message forwarding, and removal of registered handlers.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_decoder.py",
+    "path": "tests/files/test_files_decoder.py",
+    "content": {
+      "structured": {
+        "description": "A test suite for the `YAMLDataDecoder` class using the `unittest` package. The tests check if the decoder correctly raises an `UndeclaredGlobalVariableError` when referencing unknown global variables in YAML data structures such as dictionaries and lists, and also verifies that it decodes known variables correctly.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_files_loader.py",
+    "path": "tests/files/test_files_loader.py",
+    "content": {
+      "structured": {
+        "description": "A test suite for the YAMLDataLoader class using unittest and mock libraries. The test cases cover three scenarios: testing for RigelfileNotFoundError when an non-existent file is provided, testing for EmptyRigelfileError when a file with no data is provided, and testing for UnformattedRigelfileError when a file with improper formatting is provided.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_models_builder.py",
+    "path": "tests/models/test_models_builder.py",
+    "content": {
+      "structured": {
+        "description": "Unit tests for the `ModelBuilder` class from the `rigel.models.builder` module using the `unittest` and `pydantic` packages. The tests validate whether a `PydanticValidationError` is thrown when building a model with invalid data, and ensure that injected data is properly forwarded to the model constructor.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_models_package.py",
+    "path": "tests/models/test_models_package.py",
+    "content": {
+      "structured": {
+        "description": "A test suite using unittest framework to test the SSHKey class from rigel.models package. The SSHKey class is responsible for creating an SSH key model and verifying its properties. The test suite includes one test case that checks if UndeclaredEnvironmentVariableError is thrown when trying to create an SSHKey instance with an undeclared environment variable.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_buildx_models.py",
+    "path": "tests/plugins/core/buildx/test_buildx_models.py",
+    "content": {
+      "structured": {
+        "description": "A test suite for the PluginModel class in the Rigel buildx models package. The tests verify that instances of PluginModel can be created with default values and that an instance of UnsupportedPlatformError is thrown if an unsupported platform is specified. The testing framework used is unittest, which provides a comprehensive set of tools for building and running tests.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_buildx_plugin.py",
+    "path": "tests/plugins/core/buildx/test_buildx_plugin.py",
+    "content": {
+      "structured": {
+        "description": "A plugin for building and managing Docker images using BuildX, which is a feature in Docker that allows users to build and manage multiple Docker images at once. The plugin provides several functionalities such as logging in and out of Docker registries, creating and deleting builders, configuring and deleting QEMU files, and running Docker builds. It also includes unit tests for these functionalities.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_dockerfile_models.py",
+    "path": "tests/plugins/core/dockerfile/test_dockerfile_models.py",
+    "content": {
+      "structured": {
+        "description": "A test suite for the PluginModel class in Rigel's Dockerfile plugin. The PluginModel represents the configuration of a Docker image and provides default values for various settings such as command, distribution, package and compiler. The tests cover scenarios where default values are set and custom ROS images are declared, and also checks if an UnsupportedCompilerError is thrown when an unsupported compiler is specified.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_dockerfile_plugin.py",
+    "path": "tests/plugins/core/dockerfile/test_dockerfile_plugin.py",
+    "content": {
+      "structured": {
+        "description": "And tests a Dockerfile core plugin using the Rigel framework. The plugin is responsible for generating a Dockerfile based on input models and packages. It uses Python's unittest module to run unit tests for this plugin, covering its initialization, target processing, and Rigelfile creation.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_dockerfile_renderer.py",
+    "path": "tests/plugins/core/dockerfile/test_dockerfile_renderer.py",
+    "content": {
+      "structured": {
+        "description": "a test suite for rendering Dockerfile templates using the `Renderer` class from `rigel.plugins.core.dockerfile.renderer`. The test case uses mock objects and patching to simulate the behavior of various components, such as template rendering and file I/O. It verifies that the rendered output is written correctly to the specified output file.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_plugin.py",
+    "path": "tests/plugins/test_plugin.py",
+    "content": {
+      "structured": {
+        "description": "three test cases for the `Plugin` class in the `rigel.plugins.plugin` module using the `unittest` framework and mocking libraries from the `mock` package. The tests cover context management, signal handling, and the `stop_plugin` method. They verify the expected behavior of these methods by asserting certain function calls.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_plugins_manager.py",
+    "path": "tests/plugins/test_plugins_manager.py",
+    "content": {
+      "structured": {
+        "description": "Unit tests for a PluginManager class from a package called Rigel. The tests cover various aspects of plugin management including plugin compliance checking, loading, and execution. The tests use mocking and patching to isolate dependencies and simulate different scenarios, such as plugin not found or plugin not compliant errors.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "__init__.py",
+    "path": "tests/__init__.py",
+    "content": {
+      "structured": {
+        "description": "A class using the dataclasses module that represents an employee with attributes such as name and salary. The class implements the __str__ method to provide a string representation of an employee object. It also overrides the __eq__ method to compare two employee objects based on their names.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_exceptions.py",
+    "path": "tests/test_exceptions.py",
+    "content": {
+      "structured": {
+        "description": "A test suite that ensures specific error classes from the rigel.exceptions module behave as expected when thrown. The exceptions include UnformattedRigelfileError, UnsupportedCompilerError, UnsupportedPlatformError, PluginNotFoundError, and PluginNotCompliantError. It uses the unittest framework to run these tests.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "test_main.py",
+    "path": "tests/test_main.py",
+    "content": {
+      "structured": {
+        "description": "Three test cases using unittest and click testing for the init function in the rigel.main module. The tests verify that the function correctly detects and initializes an existing Rigelfile, creates a new one if none exists, and overwrites it when desired.",
+        "items": []
+      }
+    }
+  },
+  {
+    "name": "noxfile.py",
+    "path": "noxfile.py",
+    "content": {
+      "structured": {
+        "description": "Three nox sessions, each responsible for running specific tasks. The \"tests\" session runs unit tests using pytest and generates test coverage reports. The \"lint\" session uses flake8 to check code style and syntax for errors. The \"typing\" session checks type declarations using mypy.",
+        "items": [
+          {
+            "id": "149db064-fd2b-ce8a-db4f-7208e4474bf1",
+            "ancestors": [],
+            "description": "Installs Poetry, runs the project's tests using Pytest and reports test coverage statistics using Coverage.",
+            "params": [
+              {
+                "name": "session",
+                "type_name": "nox.sessions.Session",
+                "description": "Used to manage the lifecycle of the test environment."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "nox.run()\n",
+              "description": ""
+            },
+            "name": "tests",
+            "location": {
+              "start": 5,
+              "insert": 7,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 6,
+            "docLength": null
+          },
+          {
+            "id": "c00e50cf-9719-5e92-e946-9c1f3924a1f5",
+            "ancestors": [],
+            "description": "Installs Poetry, a Python package manager, and uses it to install dependencies. Then, it runs Flake8, a static code analysis tool, on the current directory (.). This ensures that the code is free from syntax errors and follows PEP 8 style guidelines.",
+            "params": [
+              {
+                "name": "session",
+                "type_name": "nox.sessions.Session",
+                "description": "Used to interact with the Nox testing tool, which allows for running tests and other commands within the context of a session."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "lint()\n",
+              "description": ""
+            },
+            "name": "lint",
+            "location": {
+              "start": 14,
+              "insert": 16,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 5,
+            "docLength": null
+          },
+          {
+            "id": "4b1111c2-0f35-2795-5f43-48b1bcae1c4f",
+            "ancestors": [],
+            "description": "Sets up a Poetry project by installing the package manager and then installs dependencies using Poetry. Additionally, it runs MyPy type checker to check for type errors in the project's source code.",
+            "params": [
+              {
+                "name": "session",
+                "type_name": "nox.sessions.Session",
+                "description": "An instance that represents the current execution context for the script."
+              }
+            ],
+            "returns": null,
+            "usage": {
+              "language": "python",
+              "code": "typing(\"path/to/project\")\n",
+              "description": ""
+            },
+            "name": "typing",
+            "location": {
+              "start": 22,
+              "insert": 24,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 5,
+            "docLength": null
+          }
+        ]
+      }
+    }
+  }
+]

@@ -10,11 +10,45 @@ from .node import SimulationRequirementNode
 
 class AbsenceSimulationRequirementNode(SimulationRequirementNode):
     """
-    An absence simulation requirement node ensures
-    that no ROS message was received that satisfies a given condition.
+    Simulates absence by monitoring its child nodes for satisfaction and sends
+    commands to downstream or upstream nodes based on their status and a specified
+    timeout.
+
+    Attributes:
+        children (List[SimulationRequirementNode]): Initialized to an empty list
+            during object creation. It stores child nodes, which are instances of
+            SimulationRequirementNode or its subclasses.
+        father (SimulationRequirementNode|None): Initialized to None. It is used
+            to store the parent node of the current node, if any, in a tree-like
+            structure.
+        timeout (float|int): 0 by default. It represents the time limit for which
+            a simulation requirement should be satisfied, after which it will
+            automatically stop if not met.
+        __timer (threadingTimer|None): Initialized with a timer that calls the
+            `handle_timeout` method after a specified timeout period when started.
+        handle_timeout (NoneNone): A method that gets called when a timer set in
+            the node times out. It cancels any ongoing simulation if it has not
+            been satisfied by then.
+        satisfied (bool): Initially set to True when an instance of this class is
+            created. It indicates whether all child nodes have satisfied their
+            requirements or not.
+
     """
 
     def __init__(self, timeout: float = inf) -> None:
+        """
+        Initializes an instance by setting up attributes for children, father,
+        timeout, and timer. It also sets the initial satisfaction state to True
+        and creates a timer that will call the handle_timeout method after the
+        specified timeout period.
+
+        Args:
+            timeout (float): 0 by default, which specifies the time after which
+                an action should be performed. The value `inf` means that no timeout
+                will occur. It is set to `self.__timer`, which triggers a timeout
+                event when it expires.
+
+        """
         self.children = []
         self.father = None
         self.timeout = timeout
@@ -25,6 +59,17 @@ class AbsenceSimulationRequirementNode(SimulationRequirementNode):
         self.satisfied = True
 
     def __str__(self) -> str:
+        """
+        Returns a string representation of itself and its child nodes by recursively
+        concatenating their string representations. This is used to provide a
+        human-readable output for the node and its children.
+
+        Returns:
+            str: A string representation of the object, consisting of the string
+            representations of its children. The returned string is created by
+            concatenating the strings of all child objects.
+
+        """
         repr = ''
         for child in self.children:
             repr += f'{str(child)}'
@@ -32,11 +77,14 @@ class AbsenceSimulationRequirementNode(SimulationRequirementNode):
 
     def assess_children_nodes(self) -> bool:
         """
-        An absence simulation requirement is considered satisfied
-        only if no children simulation requirements is satisfied.
+        Iterates over its child nodes, checks if any are satisfied, and returns
+        False if found; otherwise, it returns True, indicating that none of the
+        children are satisfied.
 
-        :rtype: bool
-        :return: True if no children simulation requirement is satisfied. False otherwise.
+        Returns:
+            bool: True if all children nodes are not satisfied and False otherwise,
+            indicating whether there are any child nodes that are already satisfied.
+
         """
         for child in self.children:
 
@@ -53,8 +101,10 @@ class AbsenceSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_children_status_change(self) -> None:
         """
-        Handle STATUS_CHANGE commands sent by children nodes.
-        Whenever a child changes state a disjoint requirement node must check its satisfability.
+        Handles changes in the status of children nodes and triggers corresponding
+        actions, such as disconnecting from Rosbridge, stopping simulation, and
+        updating internal state variables.
+
         """
         if not self.assess_children_nodes():  # only consider state changes
             self.satisfied = False
@@ -69,19 +119,23 @@ class AbsenceSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_timeout(self) -> None:
         """
-        Handle timeout events.
-        Issue children nodes to stop listening for ROS messages.
+        Checks if the node's satisfaction status (`self.satisfied`) is not met,
+        and if so, sends a stop simulation command upstream using the provided
+        `CommandBuilder`. This likely handles a timeout condition in an absence
+        simulation requirement.
+
         """
         if not self.satisfied:
             self.send_upstream_cmd(CommandBuilder.build_stop_simulation_cmd())
 
     def handle_rosbridge_connection_commands(self, command: Command) -> None:
         """
-        Handle commands of type ROSBRIDGE_CONNECT.
-        Forward command to all children nodes and initialize timer thread.
+        Sends a command downstream and starts a timer if a time limit was specified,
+        allowing execution to be limited by a timeout.
 
-        :param command: Received command.
-        :type command: Command
+        Args:
+            command (Command): Required.
+
         """
         self.send_downstream_cmd(command)
 
@@ -91,33 +145,43 @@ class AbsenceSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_rosbridge_disconnection_commands(self, command: Command) -> None:
         """
-        Handle commands of type ROSBRIDGE_DISCONNECT.
-        Forwars command to all children nodes and stop timer threads.
+        Cancels any pending timer and sends downstream command when ROS bridge
+        disconnection commands are received.
 
-        :param command: Received command.
-        :type command: Command
+        Args:
+            command (Command): Required for the method invocation. Its exact nature
+                is not specified by this code snippet, but it likely represents a
+                command related to ROSBridge disconnection.
+
         """
         self.__timer.cancel()  # NOTE: this method does not require previous call to 'start()'
         self.send_downstream_cmd(command)
 
     def handle_upstream_command(self, command: Command) -> None:
         """
-        Generic command handler.
-        Forwards incoming upstream commands to their proper handler.
+        Processes an upstream command, specifically checking if the command is of
+        type STATUS_CHANGE. If so, it calls the `handle_children_status_change`
+        method to handle status changes for its children nodes.
 
-        :param command: Received upstream command.
-        :type command: Command
+        Args:
+            command (Command): Expected to hold an instance of a class representing
+                a command with a specific type, namely CommandType.STATUS_CHANGE.
+
         """
         if command.type == CommandType.STATUS_CHANGE:
             self.handle_children_status_change()
 
     def handle_downstream_command(self, command: Command) -> None:
         """
-        Generic command handler.
-        Forwards incoming downstream commands to their proper handler.
+        Handles downstream commands received from other nodes or systems. It
+        dispatches the commands based on their type, processing ROSbridge connection
+        and disconnection requests, and triggering specific actions for other
+        command types.
 
-        :param command: Received dowstream command.
-        :type command: Command
+        Args:
+            command (Command): Required to be processed by the function. Its type
+                attribute determines which specific handling method should be executed.
+
         """
         if command.type == CommandType.ROSBRIDGE_CONNECT:
             self.handle_rosbridge_connection_commands(command)

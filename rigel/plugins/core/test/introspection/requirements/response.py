@@ -12,18 +12,56 @@ from .simple import SimpleSimulationRequirementNode
 
 class ResponseSimulationRequirementNode(SimulationRequirementNode):
     """
-    A response simulation requirement node ensures
-    that no ROS message is received that satisfies posterior requirements
-    before anterior requirements were previously satisfied.
+    Simulates a node in a simulation requirement tree, handling commands and
+    timeouts to assess satisfaction of its children nodes and send appropriate
+    upstream or downstream commands.
+
+    Attributes:
+        children (List[SimulationRequirementNode]): Initialized to an empty list
+            during object creation. It holds references to child nodes that are
+            managed by this node.
+        father (SimulationRequirementNode|None): Used to represent the parent node
+            in a hierarchical structure of requirement nodes.
+        timeout (float|int): 0 by default. It represents the time limit for which
+            the node should wait before sending a specific command when a child
+            node becomes satisfied.
+        __timer (threadingTimer): Initialized in the `__init__` method with a
+            timeout period specified by the `timeout` parameter. It is responsible
+            for triggering the `handle_timeout` method when the timer expires.
+        handle_timeout (None): Defined as a method. It cancels the timer, assesses
+            the satisfaction of child nodes based on their status, and sends
+            appropriate commands to upstream or downstream nodes if necessary.
+
     """
 
     def __init__(self, timeout: float = inf) -> None:
+        """
+        Initializes an object with an empty list of children, no father node by
+        default, a specified timeout period, and sets up a timer to trigger the
+        handle_timeout method when the timeout expires.
+
+        Args:
+            timeout (float): Infinity (`inf`) by default. It represents the timeout
+                value in seconds for which the timer will wait before calling the
+                `handle_timeout` method if no event occurs.
+
+        """
         self.children = []
         self.father = None
         self.timeout = timeout
         self.__timer = threading.Timer(timeout, self.handle_timeout)
 
     def __str__(self) -> str:
+        """
+        Converts its children nodes into strings and concatenates them into a
+        single string representation, allowing for easy stringification of the
+        node's contents.
+
+        Returns:
+            str: A string representation of the object, constructed by concatenating
+            the string representations of all child objects in the list `self.children`.
+
+        """
         repr = ''
         for child in self.children:
             repr += f'{str(child)}'
@@ -31,11 +69,13 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def assess_children_nodes(self) -> bool:
         """
-        A response simulation requirement is considered satisfied
-        only if the posterior requirement is satisfied after the anterior requirement.
+        Checks if both child nodes, anterior and posterior, are satisfied, returning
+        True only if they are both satisfied.
 
-        :rtype: bool
-        :return: True is requirement is satisfied. False otherwise.
+        Returns:
+            bool: True if both child nodes (`anterior` and `posterio`) satisfy
+            their conditions, otherwise it returns False.
+
         """
         anterior = self.children[0]
         posterior = self.children[1]
@@ -52,8 +92,10 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_timeout(self) -> None:
         """
-        Handle timeout events.
-        Issue children nodes to stop listening for ROS messages.
+        Assesses the satisfaction of its children nodes, then sends either status
+        change, disconnect, or stop simulation commands upstream and downstream
+        depending on whether the requirement is satisfied or not.
+
         """
         self.satisfied = self.assess_children_nodes()
         if self.satisfied:
@@ -66,8 +108,11 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_children_status_change(self) -> None:
         """
-        Handle STATUS_CHANGE commands sent by children nodes.
-        Whenever a child changes state a disjoint requirement node must check its satisfability.
+        Monitors the status changes of its two child nodes, anterior and posterior,
+        and updates the node's own status accordingly. It cancels a timer, sends
+        disconnect and status change commands to downstream and upstream nodes
+        respectively if the children are satisfied.
+
         """
         anterior = self.children[0]
         posterior = self.children[1]
@@ -91,11 +136,15 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_trigger(self, command: Command) -> None:
         """
-        Handle commands of type TRIGGER.
-        Forward command to anterior children.
+        Notifies the anterior requirement node of an incoming command, ensuring
+        that only the anterior node is notified initially, while posterior nodes
+        start listening for ROS messages after satisfying their requirements.
 
-        :param command: Received command.
-        :type command: Command
+        Args:
+            command (Command): Expected to be passed from outside the function.
+                It represents some kind of instruction or request that needs to
+                be handled by this function.
+
         """
         # Notify only the anterior requirement node.
         # Posterior node must only start listening for ROS messages after it being satisfied.
@@ -104,11 +153,14 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_rosbridge_connection_commands(self, command: Command) -> None:
         """
-        Handle commands of type ROSBRIDGE_CONNECT.
-        Forward command to all children nodes and initialize timer thread.
+        Sends downstream commands and starts a timer if a timeout was specified.
+        The timer will only be started after all ROS message handlers are registered.
 
-        :param command: Received command.
-        :type command: Command
+        Args:
+            command (Command): Expected to be an instance of a class representing
+                ROS (Robot Operating System) commands, which are used for communication
+                between ROS nodes.
+
         """
         self.send_downstream_cmd(command)
 
@@ -118,11 +170,14 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_rosbridge_disconnection_commands(self, command: Command) -> None:
         """
-        Handle commands of type ROSBRIDGE_DISCONNECT.
-        Forwars command to all children nodes and stop timer threads.
+        Handles ROSBridge disconnection commands, cancels a timer if it's running,
+        assesses the satisfaction of its children nodes, and sends upstream and
+        downstream commands accordingly.
 
-        :param command: Received command.
-        :type command: Command
+        Args:
+            command (Command): Passed to the method during its invocation. It
+                represents a command that is being handled or processed by the method.
+
         """
         self.__timer.cancel()  # NOTE: this method does not require previous call to 'start()'
 
@@ -134,22 +189,30 @@ class ResponseSimulationRequirementNode(SimulationRequirementNode):
 
     def handle_upstream_command(self, command: Command) -> None:
         """
-        Generic command handler.
-        Forwards incoming upstream commands to their proper handler.
+        Handles incoming commands and executes specific actions based on the command
+        type. If the received command is of type STATUS_CHANGE, it invokes the
+        `handle_children_status_change` method to perform subsequent operations.
 
-        :param command: Received upstream command.
-        :type command: Command
+        Args:
+            command (Command): An instance that represents a specific upstream
+                command sent to this process or thread. Its type, CommandType,
+                determines the action it needs to perform.
+
         """
         if command.type == CommandType.STATUS_CHANGE:
             self.handle_children_status_change()
 
     def handle_downstream_command(self, command: Command) -> None:
         """
-        Generic command handler.
-        Forwards incoming downstream commands to their proper handler.
+        Processes downstream commands, specifically ROSBRIDGE connection and
+        disconnection requests, as well as trigger events. It dispatches these
+        commands to respective handling methods based on their types.
 
-        :param command: Received dowstream command.
-        :type command: Command
+        Args:
+            command (Command): Expected to hold data that can be processed by the
+                method. The specific details and properties of this command depend
+                on its type.
+
         """
         if command.type == CommandType.ROSBRIDGE_CONNECT:
             self.handle_rosbridge_connection_commands(command)

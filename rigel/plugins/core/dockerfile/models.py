@@ -6,15 +6,39 @@ from typing import Any, Dict, List
 class Compiler(BaseModel, extra=Extra.forbid):
 
     # Optional fields
+    """
+    Defines a model for compiler settings with validation. It has two attributes:
+    `name`, which must be either `'catkin_make'` or `'colcon'`, and `cmake_args`,
+    a dictionary for additional arguments. The `validate_compiler` method ensures
+    the correctness of the `name`.
+
+    Attributes:
+        name (str): Initialized with a default value of 'catkin_make'. It is
+            validated by the `validate_compiler` method to ensure that it is either
+            'catkin_make' or 'colcon'.
+        cmake_args (Dict[str, str]): Initialized as an empty dictionary. It allows
+            the user to specify key-value pairs for CMake arguments specific to
+            each compiler instance.
+
+    """
     name: str = 'catkin_make'
     cmake_args: Dict[str, str] = {}
 
     @validator('name')
     def validate_compiler(cls, name: str) -> str:
-        """Ensure that the specified ROS package compiler used is supported by Rigel.
+        """
+        Validates the given compiler name against a list of supported names
+        ("catkin_make" and "colcon"). If the name is not supported, it raises an
+        UnsupportedCompilerError; otherwise, it returns the validated name.
 
-        :type name: string
-        :param name: ROS package compiler.
+        Args:
+            name (str): Required for validation. It represents the name of a
+                compiler, specifically referring to "catkin" or "colcon".
+
+        Returns:
+            str: The validated compiler name, i.e., either 'catkin' or 'colcon'.
+            If the input name is not supported, it raises an exception.
+
         """
         # NOTE: At the moment only "catkin" and "colcon" are supported.
         if name not in ['catkin_make', 'colcon']:
@@ -23,30 +47,36 @@ class Compiler(BaseModel, extra=Extra.forbid):
 
 
 class PluginModel(BaseModel, extra=Extra.forbid):
-    """A plugin that creates a ready-to-use Dockerfile for an existing ROS package.
+    """
+    Defines a data model for plugins with various optional fields representing
+    configuration settings and dependencies. It sets default values for certain
+    fields, such as `ros_image`, based on other parameters provided during initialization.
 
-    :type command: string
-    :cvar command: The command to be executed once a container starts executing.
-    :type apt: List[string]
-    :cvar apt: The name of dependencies to be installed using APT.
-    :type compiler: Compiler
-    :cvar compiler: The tool with which to compile the containerized ROS workspace. Default value is 'catkin_make'.
-    :type entrypoint: List[string]
-    :cvar entrypoint: A list of commands to be run while executing the entrypoint script.
-    :type env: List[Dict[str, Any]]
-    :cvar env: A list of environment variables to be set inside the Docker image.
-    :type rosinstall: List[string]
-    :cvar rosinstall: A list of all required .rosinstall files.
-    :type ros_image: string
-    :cvar ros_image: The official ROS Docker image to use as a base for the new Docker image.
-    :type docker_run: List[string]
-    :cvar docker_run: A list of commands to be executed while building the Docker image.
-    :type python_dependencies: List[string]
-    :cvar python_dependencies: A list of python dependencies to be installed using pip.
-    :type python_requirements_file: List[string]
-    :cvar python_requirements_file: A list of python requirements.txt file paths.
-    :type username: string
-    :cvar username: The desired username. Defaults to 'user'.
+    Attributes:
+        compiler (Compiler): Optional.
+        command (str): Initialized with a default value of an empty string. It
+            allows optional specification of a command for the plugin.
+        apt (List[str]): Used to store a list of package names that can be installed
+            using the Advanced Package Tool (APT).
+        entrypoint (List[str]): Used to store a list of entry points for a plugin.
+        env (List[Dict[str, Any]]): Optional. It represents a list of environment
+            variables, where each variable is represented as a dictionary with
+            keys 'name' and 'value'.
+        rosinstall (List[str]): Used to store a list of strings representing ROS
+            (Robot Operating System) installable packages.
+        ros_image (str): Initialized with a default value when no explicit value
+            is provided for it in the model's constructor. The default value is
+            constructed based on the 'distro' attribute.
+        docker_run (List[str]): Used to specify a list of strings representing
+            Docker run commands.
+        python_dependencies (List[str]): Used to store a list of Python dependencies
+            required by the plugin. It is initialized as an empty list during
+            object creation.
+        python_requirements_file (List[str]): Optional. It represents a list of
+            file paths to Python requirements files for the plugin.
+        username (str): Set to 'rigeluser' by default. It can be overridden when
+            initializing an instance of the model if a different value is provided.
+
     """
     # Optional fields.
     compiler: Compiler
@@ -64,6 +94,16 @@ class PluginModel(BaseModel, extra=Extra.forbid):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
 
+        """
+        Initializes its object by calling the parent's `__init__` method with the
+        provided arguments and keyword arguments. It modifies the keyword arguments
+        to ensure a 'ros_image' is present and removes the 'distro' keyword argument.
+
+        Args:
+            *args (Any): List of positional arguments
+            **kwargs (Any): Dictionary of keyword arguments
+
+        """
         if not kwargs.get('ros_image'):
             kwargs['ros_image'] = f'ros:{kwargs["distro"]}'
         del kwargs['distro']
