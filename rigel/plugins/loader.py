@@ -12,7 +12,10 @@ from typing import Any, Type
 
 class PluginLoader:
     """
-    A class to load external Rigel plugins at runtime.
+    Validates and loads plugins. It checks if a plugin's entrypoint is compliant
+    with specified methods, then imports and initializes it using the `ModelBuilder`.
+    If not compliant, it raises an error.
+
     """
 
     def is_plugin_compliant(self, entrypoint: Type) -> bool:
@@ -32,30 +35,37 @@ class PluginLoader:
 
     def is_run_compliant(self, entrypoint: Type) -> bool:
         """
-        Ensure that the 'run' function declared inside an external plugin's entrypoint class
-        is not expecting any parameters (except for self).
+        Checks whether an entrypoint's run method complies with the requirement
+        that it has exactly one parameter, excluding the implicit 'self' parameter.
+        It returns True if compliant and False otherwise.
 
-        :type entrypoint: Type
-        :param entrypoint: The external plugin entrypoint class.
+        Args:
+            entrypoint (Type): An object representing a callable Python function,
+                specifically the entry point to be checked for compliance with the
+                Run protocol.
 
-        :rtype: bool
-        :return: True if the 'run' function inside the external plugin's entrypoint class
-        exoects no arguments. False otherwise.
+        Returns:
+            bool: True if the entrypoint's run method has exactly one parameter,
+            excluding 'self', and False otherwise.
+
         """
         signature = inspect.signature(entrypoint.run)
         return not len(signature.parameters) != 1  # allows for no parameter besides self
 
     def is_stop_compliant(self, entrypoint: Type) -> bool:
         """
-        Ensure that the 'stop' function declared inside an external plugin's entrypoint class
-        is not expecting any parameters (except for self).
+        Checks if an entrypoint's stop method conforms to the stop protocol, i.e.,
+        it takes exactly one argument besides self.
 
-        :type entrypoint: Type
-        :param entrypoint: The external plugin entrypoint class.
+        Args:
+            entrypoint (Type): An object that represents a class, which has a
+                method named `stop`. This method's signature is inspected to
+                determine if it complies with certain requirements.
 
-        :rtype: bool
-        :return: True if the 'stop' function inside the external plugin's entrypoint class
-        exoects no arguments. False otherwise.
+        Returns:
+            bool: True if the `stop` method of the `entrypoint` object has exactly
+            one parameter (excluding `self`), and False otherwise.
+
         """
         signature = inspect.signature(entrypoint.stop)
         return not len(signature.parameters) != 1  # allows for no parameter besides self
@@ -63,13 +73,20 @@ class PluginLoader:
     # TODO: set return type to Plugin
     def load(self, plugin: PluginSection) -> Any:
         """
-        Parse a list of plugins.
+        Loads and validates a plugin by importing its module, checking its compliance
+        with required attributes and methods, and then building an instance of the
+        plugin using its arguments and keyword arguments.
 
-        :type plugin: rigel.models.PluginSection
-        :param plugin: Information regarding the plugin to load.
+        Args:
+            plugin (PluginSection): Expected to have a name attribute which is a
+                string representing the path of the plugin module followed by the
+                entrypoint class, for example "path/to/plugin/my_plugin".
 
-        :rtype: Plugin
-        :return: An instance of the specified plugin.
+        Returns:
+            Any: An instance of a class built by `ModelBuilder`. The instance is
+            constructed with arguments and keyword arguments passed from the
+            `plugin.args` and `plugin.kwargs`.
+
         """
         _, plugin_name = plugin.name.strip().split('/')
         complete_plugin_name = f'{plugin.name}.{plugin.entrypoint}'

@@ -7,24 +7,23 @@ from .simulation import SimulationSection
 
 class Rigelfile(BaseModel):
     """
-    Main information placeholder.
-    Placeholder for all the information contained within a Rigelfile.
-    Each Rigelfile contains the complete information used by Rigel to containerize ROS applications.
-    If applicable, information regarding the deployment of Docker images and
-    the execution of containerized ROS applications may also also be declared within a Rigelfile.
+    Defines a model for a Rigel configuration file. It consists of required and
+    optional sections. The required section is "packages", which accepts at least
+    one declaration from either `DockerSection` or `DockerfileSection`. Optional
+    sections include "deploy", "simulate", and "vars".
 
-    Each Rigelfile is divided into several sections.
+    Attributes:
+        packages (List[Union[DockerSection, DockerfileSection]]): Required to have
+            at least one package declaration.
+        deploy (List[PluginSection]): Optional. It represents a list of plugin
+            sections that are used for deployment purposes, and can be empty if
+            no plugins are required.
+        simulate (Optional[SimulationSection]): Optional. It represents a Simulation
+            Section that can be used to simulate deployment operations.
+        vars (Dict[str, Any]): Optional. It represents a dictionary that maps
+            strings to any data type, allowing for flexible storage and retrieval
+            of variables with string keys.
 
-    :type deploy: List[PluginSection]
-    :cvar deploy: Section containing information regarding which external plugins to use when
-    deploying Docker images of containerized ROS packages.
-    :type packages: List[Union[DockerSection, DockerfileSection]
-    :cvar packages: Section containing information regarding how to containerize the ROS packages using Docker.
-    :type simulate: List[PluginSection]
-    :cvar simulate: Section containing information regarding which external plugins to use when
-    executing the containerized ROS application.
-    :type vars: Dict[str, Any]
-    :cvar vars: Section containing the values of user-defined global variables.
     """
     # Required sections.
     packages: List[Union[DockerSection, DockerfileSection]]  # at least one package declaration is required
