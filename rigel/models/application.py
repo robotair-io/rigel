@@ -6,16 +6,17 @@ LOGGER = get_logger()
 
 
 class Application(BaseModel, extra=Extra.forbid):
-    """A placeholder for generic information about a ROS application.
-    Each ROS application contains at least one ROS package.
+    """
+    Defines a model that inherits from `BaseModel`. It has two properties: `distro`,
+    which is required, and `dir`, which is optional with a default value of `'.'`.
+    The `extra=Extra.forbid` parameter ensures that no additional attributes can
+    be defined for the object.
 
-    Each ROS application may support the execution of individual jobs.
-
-    :type distro: str
-    :cvar distro: Target ROS distro.
-    :type dir: string
-    :cvar dir: The folder containing the ROS package source code, if any.
-               Defaults to '.'.
+    Attributes:
+        distro (str): Required, meaning it must be provided when instantiating an
+            instance of the `Application` class.
+        dir (str): Optional, meaning it can be omitted when creating an instance
+            of the class. Its default value is '.'.
 
     """
     # Required fields.

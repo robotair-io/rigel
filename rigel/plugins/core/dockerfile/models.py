@@ -6,6 +6,20 @@ from typing import Any, Dict, List
 class Compiler(BaseModel, extra=Extra.forbid):
 
     # Optional fields
+    """
+    Validates and represents a compiler, specifically for building packages using
+    catkin or colcon. It has properties for the compiler's name and additional
+    CMake arguments. The `validate_compiler` method checks if the provided name
+    is either "catkin_make" or "colcon", raising an error otherwise.
+
+    Attributes:
+        name (str): Initialized with a default value of 'catkin_make'. It is
+            validated using the `validate_compiler` method to ensure it is either
+            'catkin_make' or 'colcon'.
+        cmake_args (Dict[str, str]): Initialized with an empty dictionary. It
+            allows storing key-value pairs as arguments for CMake commands.
+
+    """
     name: str = 'catkin_make'
     cmake_args: Dict[str, str] = {}
 
@@ -64,6 +78,17 @@ class PluginModel(BaseModel, extra=Extra.forbid):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
 
+        """
+        Initializes an instance with optional keyword arguments. If no 'ros_image'
+        argument is provided, it defaults to a string formatted from 'distro'. The
+        'distro' keyword is then removed from the arguments. This initialization
+        process calls the superclass's constructor (`super().__init__(*args, **kwargs)`).
+
+        Args:
+            *args (Any): List of positional arguments
+            **kwargs (Any): Dictionary of keyword arguments
+
+        """
         if not kwargs.get('ros_image'):
             kwargs['ros_image'] = f'ros:{kwargs["distro"]}'
         del kwargs['distro']

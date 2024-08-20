@@ -7,7 +7,23 @@ from .models import PluginModel
 
 
 class Renderer:
-    """A class that creates Dockerfiles.
+    """
+    Initializes a renderer with distro, workdir, and configuration file, then
+    renders a Dockerfile template to an output file based on input parameters,
+    including cmake args and ssh keys.
+
+    Attributes:
+        distro (str): Initialized during the object's creation. It represents the
+            distribution or operating system used by the application.
+        workdir (str): Initialized with a string value during object creation. It
+            stores the directory path where the rendering process will take place.
+        configuration_file (PluginModel): Initialized with a value passed to it
+            during object creation. It represents configuration settings for
+            rendering Dockerfiles or other build scripts.
+        ssh_keys (Dict|None): Initialized with the given `ssh_keys`. If it's
+            provided, it initializes the attribute directly; otherwise, it creates
+            a default instance using `ModelBuilder`.
+
     """
 
     def __init__(
@@ -18,8 +34,23 @@ class Renderer:
         ssh_keys: Optional[SSHProviderOutputModel]
     ) -> None:
         """
-        :type configuration_file: pydantic.BaseModel
-        :param configuration_file: An aggregator of information about the containerization of the ROS application.
+        Initializes an object with four parameters: distro, workdir, configuration_file,
+        and ssh_keys. If ssh_keys are provided, it converts them to a dictionary;
+        otherwise, it creates empty SSH keys. The method sets these values as
+        attributes of the object.
+
+        Args:
+            distro (str): Used to initialize an instance variable named `self.distro`.
+                It represents a string value that describes the Linux distribution.
+            workdir (str): Assigned to an instance variable named `self.workdir`.
+                It seems to represent a directory path for working.
+            configuration_file (PluginModel): Assigned to an instance variable
+                with the same name. This suggests that it represents a configuration
+                file for plugins.
+            ssh_keys (Optional[SSHProviderOutputModel]): Optional. If provided,
+                it is converted to a dictionary; otherwise, an empty dictionary
+                is created using ModelBuilder.
+
         """
         self.distro = distro
         self.workdir = workdir
@@ -31,12 +62,16 @@ class Renderer:
 
     def render(self, template: str, output: str) -> None:
         """
-        Create a new Dockerfile.
+        Processes and writes a Dockerfile template to a file based on provided
+        parameters, such as distribution, working directory, configuration settings,
+        CMake arguments, and SSH keys, using a templating engine.
 
-        :type template: string
-        :param template: Name of the template file to render.
-        :type output: string
-        :param output: Name for the output rendered file.
+        Args:
+            template (str): Required to be passed. It represents a string that
+                specifies the name of the Dockerfile template to be used for rendering.
+            output (str): Used to specify the name of the file where the rendered
+                Dockerfile template will be written.
+
         """
 
         # Process CMake arguments for compiler, if any.

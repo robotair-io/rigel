@@ -9,7 +9,13 @@ from typing import Any
 
 class YAMLDataLoader:
     """
-    A class to extract the content of YAML files.
+    Loads YAML data from a file and returns it as a Python object. It handles
+    exceptions for missing files, invalid YAML syntax, and empty files.
+
+    Attributes:
+        filepath (str): Initialized in the constructor method with a string parameter
+            representing the path to the YAML file that needs to be loaded.
+
     """
 
     def __init__(self, filepath: str) -> None:
@@ -21,10 +27,15 @@ class YAMLDataLoader:
 
     def load(self) -> Any:
         """
-        Open a YAML file and return its contents.
+        Attempts to load a YAML configuration file at a specified filepath. If
+        successful, it returns the loaded data as a Python object. If an error
+        occurs (e.g., file not found or corrupted), it raises a corresponding exception.
 
-        :rtype: dict
-        :return: The YAML data.
+        Returns:
+            Any: An object containing data loaded from a YAML file at the specified
+            filepath, or raises an exception if the file cannot be found, is empty,
+            or contains invalid YAML formatting.
+
         """
 
         try:

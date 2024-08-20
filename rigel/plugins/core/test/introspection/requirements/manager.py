@@ -11,11 +11,52 @@ from typing import List
 
 class SimulationRequirementsManager(SimulationRequirementNode):
     """
-    A simulation requirements manager is responsible for
-    controling all different node trees associated with a given simulation.
+    Manages simulation requirements and their children, connecting to a ROSBridge
+    client, starting/stopping timers, sending commands downstream, assessing child
+    nodes' satisfaction, and handling state changes and stop simulations requests.
+
+    Attributes:
+        children (List[SimulationRequirementNode]): Initialized as an empty list
+            during object creation.
+        father (SimulationRequirementNode|None): Initialized to None. It represents
+            the parent node in a tree-like structure, where children are added
+            using the add_child method.
+        finished (bool): Initially set to False. It indicates whether a simulation
+            has finished or not, which can be changed by calling the stop_simulation
+            method.
+        __introspection_started (bool): Initially set to False when a simulation
+            starts. It tracks whether the introspection process has been started
+            or not.
+        __start_timer (threadingTimer|None): Initialized to a Timer object that
+            calls the `handle_start_timeout` method after a specified time
+            (min_timeout) has passed.
+        handle_start_timeout (NoneNone): Scheduled to be called after a certain
+            period (min_timeout) has passed. It sets `__introspection_started` to
+            True, sends a trigger command downstream, and calls the
+            `handle_children_status_change` method.
+        __stop_timer (threadingTimer|None): Initialized with a timeout value equal
+            to `max_timeout`. It triggers the `handle_stop_timeout` method when
+            the timer expires, which stops the simulation.
+        handle_stop_timeout (None): Associated with a timer that starts after a
+            certain timeout period (max_timeout).
+
     """
 
     def __init__(self, max_timeout: float, min_timeout: float = 0.0) -> None:
+        """
+        Initializes an instance by setting up timers for starting and stopping
+        timeouts, maintaining lists of children nodes and a father node, tracking
+        whether the simulation has finished, and keeping track of introspection
+        start status.
+
+        Args:
+            max_timeout (float): Passed to the Timer object for stopping the
+                execution after a maximum allowed time.
+            min_timeout (float): 0.0 by default. It represents the minimum timeout
+                period for starting a timer that will trigger the `handle_start_timeout`
+                method.
+
+        """
         self.children = []
         self.father = None
         self.finished = False
@@ -26,14 +67,48 @@ class SimulationRequirementsManager(SimulationRequirementNode):
         self.__stop_timer = threading.Timer(max_timeout, self.handle_stop_timeout)
 
     def add_child(self, child: SimulationRequirementNode) -> None:
+        """
+        Adds a new child node to its list of children, establishing a hierarchical
+        relationship between parent and child nodes by setting the father attribute
+        of the child node to itself (the manager).
+
+        Args:
+            child (SimulationRequirementNode): Expected to be an instance of this
+                class. It represents the child node that will be added to the
+                current object's list of children.
+
+        """
         child.father = self
         self.children.append(child)
 
     def add_children(self, children: List[SimulationRequirementNode]) -> None:
+        """
+        Iterates over a list of child nodes, each representing a simulation
+        requirement, and adds each one as a direct child to its parent node using
+        the inherited `add_child` method.
+
+        Args:
+            children (List[SimulationRequirementNode]): Expected to contain multiple
+                SimulationRequirementNode objects that are going to be added as
+                child nodes to the current node.
+
+        """
         for child in children:
             self.add_child(child)
 
     def __str__(self) -> str:
+        """
+        Constructs a string representation of its own simulation requirements by
+        recursively calling itself on child nodes, appending each result with a
+        newline character, and returning the combined string if there are children;
+        otherwise, it returns a default message.
+
+        Returns:
+            str: Either a formatted string representation of all child objects
+            indented with newline characters, if `self.children` is not empty, or
+            the message 'No simulation requirements were provided.' otherwise.
+
+        """
         if self.children:
             repr = ''
             for child in self.children:
@@ -44,10 +119,14 @@ class SimulationRequirementsManager(SimulationRequirementNode):
 
     def connect_to_rosbridge(self, rosbridge_client: ROSBridgeClient) -> None:
         """
-        Issues children nodes to start listening for incoming ROS messages.
+        Establishes a connection to a ROSBridge client by sending a command through
+        downstream communication, and then starts two timers: start_timer and stop_timer.
 
-        :param rosbridge_client: The ROS bridge client.
-        :type rosbridge_client: ROSBridgeClient
+        Args:
+            rosbridge_client (ROSBridgeClient): Expected to be an instance of the
+                ROSBridgeClient class, which represents a client that connects to
+                a ROS bridge.
+
         """
         # self.send_downstream_cmd(CommandBuilder.build_trigger_cmd())
         self.send_downstream_cmd(CommandBuilder.build_rosbridge_connect_cmd(rosbridge_client))
@@ -57,25 +136,37 @@ class SimulationRequirementsManager(SimulationRequirementNode):
 
     def disconnect_from_rosbridge(self) -> None:
         """
-        Issue children nodes to stop listening for incoming ROS messages.
+        Disconnects from a ROS bridge by building a command to do so using
+        CommandBuilder and sending it downstream through send_downstream_cmd.
+
         """
         command = CommandBuilder.build_rosbridge_disconnect_cmd()
         self.send_downstream_cmd(command)
 
     def stop_timers(self) -> None:
+        """
+        Cancels two timers, __start_timer and __stop_timer, likely used to manage
+        simulation timing requirements.
+
+        """
         self.__start_timer.cancel()
         self.__stop_timer.cancel()
 
     def stop_simulation(self) -> None:
         """
-        Stop simulation.
+        Disconnects from ROSBridge and sets the `finished` flag to True, indicating
+        the simulation has been stopped.
+
         """
         self.disconnect_from_rosbridge()
         self.finished = True
 
     def handle_start_timeout(self) -> None:
         """
-        Allow simulation to be assessed.
+        Triggers a command to start the simulation, sets an introspection flag to
+        True, and then handles changes in child status when the simulation starts
+        or times out.
+
         """
         # Ensure that manager detects if all children requirements are
         # already satisfied whenever the simulation starts.
@@ -90,10 +181,15 @@ class SimulationRequirementsManager(SimulationRequirementNode):
 
     def assess_children_nodes(self) -> bool:
         """
-        Tell whether or not all simulation requirements were satisfied.
+        Checks if all child nodes (CommandHandler instances) have been satisfied,
+        returning True only if all are satisfied; otherwise, it returns False. The
+        satisfaction state is determined by the `satisfied` attribute of each child
+        node.
 
-        :return: True if all simulation requirements were satisfied. False otherwise.
-        :rtype: bool
+        Returns:
+            bool: True if all children nodes are satisfied, i.e., their `satisfied`
+            property is True; otherwise, it returns False.
+
         """
         # if self.children:
         if self.children and self.__introspection_started:
@@ -115,8 +211,10 @@ class SimulationRequirementsManager(SimulationRequirementNode):
 
     def handle_children_status_change(self) -> None:
         """
-        Handle STATUS_CHANGE commands sent by children nodes.
-        Whenever a child changes state a requirement node must check its satisfability.
+        Updates its internal state (`satisfied`) based on changes in child nodes'
+        statuses and performs corresponding actions: stopping timers if satisfied,
+        and simulation if previously unsatisfied.
+
         """
         if self.assess_children_nodes() != self.satisfied:  # only consider state changes
 
@@ -128,19 +226,23 @@ class SimulationRequirementsManager(SimulationRequirementNode):
 
     def handle_stop_simulation(self) -> None:
         """
-        Handle STOP_SIMULATON commands sent by children nodes.
-        Stops simulation and signals its ending.
+        Stops all timers and simulation processes.
+
         """
         self.stop_timers()
         self.stop_simulation()
 
     def handle_upstream_command(self, command: Command) -> None:
         """
-        Generic command handler.
-        Forwards incoming upstream commands to their proper handler.
+        Handles incoming commands from an upstream source, executing specific
+        actions based on the command type: either updating children's statuses if
+        the command is a STATUS_CHANGE or stopping the simulation if it's a STOP_SIMULATION.
 
-        :param command: Received upstream command.
-        :type command: Command
+        Args:
+            command (Command): Expected to be an instance of the `Command` class,
+                representing an upstream command that has been received by the
+                system or application.
+
         """
         if command.type == CommandType.STATUS_CHANGE:
             self.handle_children_status_change()
