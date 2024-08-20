@@ -4363,22 +4363,22 @@
     "path": "rigel/plugins/core/dockerfile/models.py",
     "content": {
       "structured": {
-        "description": "Two classes: Compiler and PluginModel. The Compiler class is a Pydantic model that represents a compiler for building ROS (Robot Operating System) packages. It ensures that only supported compilers like 'catkin_make' and 'colcon' are used. The PluginModel is also a Pydantic model that represents a plugin that creates a Dockerfile for an existing ROS package.",
+        "description": "Two classes, `Compiler` and `PluginModel`, using the Pydantic library for data validation and modeling. The `Compiler` class represents a ROS package compiler and ensures that only supported compilers can be used. The `PluginModel` class models a plugin that creates a Dockerfile for an existing ROS package, with various optional fields for configuration.",
         "items": [
           {
-            "id": "cb626ed4-9248-fcb0-a84c-c26503b2fd27",
+            "id": "5b383028-c274-a1bf-8d4d-b30c137eaa1f",
             "ancestors": [],
-            "description": "Defines a model for compiler settings with validation. It has two attributes: `name`, which must be either `'catkin_make'` or `'colcon'`, and `cmake_args`, a dictionary for additional arguments. The `validate_compiler` method ensures the correctness of the `name`.",
+            "description": "Validates and represents a compiler, specifically for building packages using catkin or colcon. It has properties for the compiler's name and additional CMake arguments. The `validate_compiler` method checks if the provided name is either \"catkin_make\" or \"colcon\", raising an error otherwise.",
             "attributes": [
               {
                 "name": "name",
                 "type_name": "str",
-                "description": "Initialized with a default value of 'catkin_make'. It is validated by the `validate_compiler` method to ensure that it is either 'catkin_make' or 'colcon'."
+                "description": "Initialized with a default value of 'catkin_make'. It is validated using the `validate_compiler` method to ensure it is either 'catkin_make' or 'colcon'."
               },
               {
                 "name": "cmake_args",
                 "type_name": "Dict[str, str]",
-                "description": "Initialized as an empty dictionary. It allows the user to specify key-value pairs for CMake arguments specific to each compiler instance."
+                "description": "Initialized with an empty dictionary. It allows storing key-value pairs as arguments for CMake commands."
               }
             ],
             "name": "Compiler",
@@ -4394,124 +4394,11 @@
             "docLength": null
           },
           {
-            "id": "b885e32c-8feb-ec8d-8b40-19c0e8d34d39",
+            "id": "98dd0285-46db-8397-f749-f2813061b53c",
             "ancestors": [
-              "cb626ed4-9248-fcb0-a84c-c26503b2fd27"
+              "2cef2e23-e722-9b86-894d-3b8496fd6063"
             ],
-            "description": "Validates the given compiler name against a list of supported names (\"catkin_make\" and \"colcon\"). If the name is not supported, it raises an UnsupportedCompilerError; otherwise, it returns the validated name.",
-            "params": [
-              {
-                "name": "name",
-                "type_name": "str",
-                "description": "Required for validation. It represents the name of a compiler, specifically referring to \"catkin\" or \"colcon\"."
-              }
-            ],
-            "returns": {
-              "type_name": "str",
-              "description": "The validated compiler name, i.e., either 'catkin' or 'colcon'. If the input name is not supported, it raises an exception."
-            },
-            "usage": {
-              "language": "python",
-              "code": "compiler = Compiler(name='colcon')\n",
-              "description": ""
-            },
-            "name": "validate_compiler",
-            "location": {
-              "start": 12,
-              "insert": 14,
-              "offset": " ",
-              "indent": 8,
-              "comment": {
-                "start": 13,
-                "end": 18
-              }
-            },
-            "item_type": "method",
-            "length": 6,
-            "docLength": 5
-          },
-          {
-            "id": "4aa97fb2-9d93-f28a-454c-b34ff3f5c724",
-            "ancestors": [],
-            "description": "Defines a data model for plugins with various optional fields representing configuration settings and dependencies. It sets default values for certain fields, such as `ros_image`, based on other parameters provided during initialization.",
-            "attributes": [
-              {
-                "name": "compiler",
-                "type_name": "Compiler",
-                "description": "Optional."
-              },
-              {
-                "name": "command",
-                "type_name": "str",
-                "description": "Initialized with a default value of an empty string. It allows optional specification of a command for the plugin."
-              },
-              {
-                "name": "apt",
-                "type_name": "List[str]",
-                "description": "Used to store a list of package names that can be installed using the Advanced Package Tool (APT)."
-              },
-              {
-                "name": "entrypoint",
-                "type_name": "List[str]",
-                "description": "Used to store a list of entry points for a plugin."
-              },
-              {
-                "name": "env",
-                "type_name": "List[Dict[str, Any]]",
-                "description": "Optional. It represents a list of environment variables, where each variable is represented as a dictionary with keys 'name' and 'value'."
-              },
-              {
-                "name": "rosinstall",
-                "type_name": "List[str]",
-                "description": "Used to store a list of strings representing ROS (Robot Operating System) installable packages."
-              },
-              {
-                "name": "ros_image",
-                "type_name": "str",
-                "description": "Initialized with a default value when no explicit value is provided for it in the model's constructor. The default value is constructed based on the 'distro' attribute."
-              },
-              {
-                "name": "docker_run",
-                "type_name": "List[str]",
-                "description": "Used to specify a list of strings representing Docker run commands."
-              },
-              {
-                "name": "python_dependencies",
-                "type_name": "List[str]",
-                "description": "Used to store a list of Python dependencies required by the plugin. It is initialized as an empty list during object creation."
-              },
-              {
-                "name": "python_requirements_file",
-                "type_name": "List[str]",
-                "description": "Optional. It represents a list of file paths to Python requirements files for the plugin."
-              },
-              {
-                "name": "username",
-                "type_name": "str",
-                "description": "Set to 'rigeluser' by default. It can be overridden when initializing an instance of the model if a different value is provided."
-              }
-            ],
-            "name": "PluginModel",
-            "location": {
-              "start": 25,
-              "insert": 26,
-              "offset": " ",
-              "indent": 4,
-              "comment": {
-                "start": 25,
-                "end": 50
-              }
-            },
-            "item_type": "class",
-            "length": 22,
-            "docLength": 25
-          },
-          {
-            "id": "3070535d-d8d8-d6bc-064b-454719fe8f13",
-            "ancestors": [
-              "4aa97fb2-9d93-f28a-454c-b34ff3f5c724"
-            ],
-            "description": "Initializes its object by calling the parent's `__init__` method with the provided arguments and keyword arguments. It modifies the keyword arguments to ensure a 'ros_image' is present and removes the 'distro' keyword argument.",
+            "description": "Initializes an instance with optional keyword arguments. If no 'ros_image' argument is provided, it defaults to a string formatted from 'distro'. The 'distro' keyword is then removed from the arguments. This initialization process calls the superclass's constructor (`super().__init__(*args, **kwargs)`).",
             "params": [
               {
                 "name": "*args",
@@ -4527,8 +4414,8 @@
             "returns": null,
             "usage": {
               "language": "python",
-              "code": "plugin_model = PluginModel(distro='melodic', compiler=Compiler())\n",
-              "description": "\n\nThis code snippet creates a new instance of the PluginModel class, passing 'melodic' as the distro argument and an instance of the Compiler class as the compiler argument."
+              "code": "model = PluginModel(compiler='gcc', distro='ubuntu')",
+              "description": ""
             },
             "name": "__init__",
             "location": {
