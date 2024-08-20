@@ -41,8 +41,8 @@ class PluginModel(BaseModel, extra=Extra.forbid):
     :cvar ros_image: The official ROS Docker image to use as a base for the new Docker image.
     :type docker_run: List[string]
     :cvar docker_run: A list of commands to be executed while building the Docker image.
-    :type python_dependencies: List[string]
-    :cvar python_dependencies: A list of python dependencies to be installed using pip.
+    :type pip: List[string]
+    :cvar pip: A list of python dependencies to be installed using pip.
     :type python_requirements_file: List[string]
     :cvar python_requirements_file: A list of python requirements.txt file paths.
     :type username: string
@@ -58,8 +58,8 @@ class PluginModel(BaseModel, extra=Extra.forbid):
     rosinstall: List[str] = []
     ros_image: str
     docker_run: List[str] = []
-    python_dependencies: List[str] = []
-    python_requirements_file: List[str] = []
+    pip: List[str] = []
+    python_requirements_files: List[str] = []
     username: str = 'rigeluser'
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
