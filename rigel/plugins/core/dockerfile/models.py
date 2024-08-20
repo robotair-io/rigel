@@ -43,8 +43,8 @@ class PluginModel(BaseModel, extra=Extra.forbid):
     :cvar docker_run: A list of commands to be executed while building the Docker image.
     :type pip: List[string]
     :cvar pip: A list of python dependencies to be installed using pip.
-    :type python_requirements_file: List[string]
-    :cvar python_requirements_file: A list of python requirements.txt file paths.
+    :type python_requirements_files: List[string]
+    :cvar python_requirements_files: A list of python requirements.txt file paths.
     :type username: string
     :cvar username: The desired username. Defaults to 'user'.
     """
